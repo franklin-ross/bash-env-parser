@@ -1,15 +1,20 @@
 {
-    "name": "bash-env-parser",
-    "version": "0.1.0",
-    "description": "Parse bash style environment variable replacements, with default values.",
-    "main": "dist/index.js",
-    "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1"
-    },
-    "author": "Franklin Ross",
-    "license": "MIT",
-    "devDependencies": {
-        "pegjs": "^0.10.0",
-        "prettier": "^1.19.1"
-    }
+  "name": "bash-env-parser",
+  "version": "0.1.0",
+  "description": "Parse bash style environment variable replacements, with default values.",
+  "main": "dist/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prebuild": "pegjs -o dist/parser.js src/grammar.pegjs",
+    "build": "tsc"
+  },
+  "author": "Franklin Ross",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^12.12.14",
+    "@types/pegjs": "^0.10.1",
+    "pegjs": "^0.10.0",
+    "prettier": "^1.19.1",
+    "typescript": "^3.7.2"
+  }
 }

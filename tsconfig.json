@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "outDir": "dist",
+    "strict": true,
+    "declaration": true,
+    "lib": ["es2015"]
+  },
+  "include": ["src/**.ts"]
+}
