@@ -9,6 +9,7 @@
     "author": "Franklin Ross",
     "license": "MIT",
     "devDependencies": {
-        "pegjs": "^0.10.0"
+        "pegjs": "^0.10.0",
+        "prettier": "^1.19.1"
     }
 }

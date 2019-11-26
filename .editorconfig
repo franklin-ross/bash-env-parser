@@ -1,4 +1,5 @@
 # Indentation override for all JS under lib directory
-[*.{js,ts}]
+[*.{js,ts,json}]
 indent_style = space
 indent_size = 2
+trim_trailing_whitespace = true
