@@ -4,17 +4,20 @@
   "description": "Parse bash style environment variable replacements, with default values.",
   "main": "dist/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "prebuild": "pegjs -o dist/parser.js src/grammar.pegjs",
-    "build": "tsc"
+    "test": "jest",
+    "prebuild": "pegjs -o dist/parser.pegjs.js src/parser.pegjs",
+    "build": "tsc -p tsconfig.build.json"
   },
   "author": "Franklin Ross",
   "license": "MIT",
   "devDependencies": {
+    "@types/jest": "^24.0.23",
     "@types/node": "^12.12.14",
     "@types/pegjs": "^0.10.1",
+    "jest": "^24.9.0",
     "pegjs": "^0.10.0",
     "prettier": "^1.19.1",
+    "ts-jest": "^24.2.0",
     "typescript": "^3.7.2"
   }
 }
