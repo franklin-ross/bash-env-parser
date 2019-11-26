@@ -1,0 +1,11 @@
+{
+    "name": "bash-env-parser",
+    "version": "0.1.0",
+    "description": "Parse bash style environment variable replacements, with default values.",
+    "main": "dist/index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "author": "Franklin Ross",
+    "license": "MIT"
+}
