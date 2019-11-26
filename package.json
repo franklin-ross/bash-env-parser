@@ -7,5 +7,8 @@
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "author": "Franklin Ross",
-    "license": "MIT"
+    "license": "MIT",
+    "devDependencies": {
+        "pegjs": "^0.10.0"
+    }
 }
