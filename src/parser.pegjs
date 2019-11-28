@@ -1,16 +1,6 @@
 {
-  const process = {
-    env: {
-      BOB: "Hello!"
-    }
-  };
-
-  function getEnv(name, fallback) {
-     const env = process.env[name];
-     return (env == null || env === '')
-     	? (fallback == null ? '' : fallback)
-        : env;
-  }
+  const { StringToken, QuotedStringToken, VariableToken } = require('./tokens')
+  const { unwrap, join } = require('./parser-helpers')
 }
 
 start
@@ -19,14 +9,16 @@ start
 String = QuotedString / UnquotedString
 
 EnvVar
-  = "${" _ name:VarName _ (":-" / ":=") fallback:FallbackValue "}" { return getEnv(name, fallback); }
-  / "${" _ name:VarName _ "}" { return getEnv(name); }
-  / "$" name:VarName { return getEnv(name); }
+  = "${" _ name:VarName _ fallbackType:(":-" / ":=") fallback:FallbackValue "}" {
+    return new VariableToken(name, fallbackType, fallback);
+  }
+  / "${" _ name:VarName _ "}" { return new VariableToken(name); }
+  / "$" name:VarName { return new VariableToken(name); }
   / "$" { return "$"; }
 
 FallbackValue
   = QuotedString
-  / val:((BracketStringChar / EnvVar)*) { return val.join('').trim(); }
+  / val:((BracketStringChar / EnvVar)*) { return unwrap(new StringToken(join(val))); }
 
 VarName "environment variable name"
   = [a-zA-Z_][a-zA-z_0-9]+ { return text(); }
@@ -35,11 +27,15 @@ _ "whitespace"
   = [ \t\n\r\v]*
 
 QuotedString
-  = '"' val:(DoubleStringChar / EnvVar)* '"' { return val.join(''); }
-  / "'" val:(SingleStringChar / EnvVar)* "'" { return val.join(''); }
+  = '"' val:(DoubleStringChar / EnvVar)* '"' {
+    return unwrap(new QuotedStringToken(join(val), '"'));
+  }
+  / "'" val:(SingleStringChar / EnvVar)* "'" {
+    return unwrap(new QuotedStringToken(join(val), "'"));
+  }
 
 UnquotedString
-  = val:(BareStringChar / EnvVar)* { return val.join(''); }
+  = val:(BareStringChar / EnvVar)* { return unwrap(new StringToken(join(val))); }
 
 DoubleStringChar
   = '\\' escaped:("$" / '"') { return escaped; }

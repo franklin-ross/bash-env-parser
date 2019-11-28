@@ -1,7 +1,7 @@
-import x, { Parser } from "pegjs";
+import { Parser } from "pegjs";
+import { Token } from "./tokens";
 
 const parser = require("./parser.pegjs") as Parser;
 
-console.log(parser.parse("$BOB"));
-
-export = parser.parse;
+/** Parses the text for bash style environment variables. */
+export default (text: string) => parser.parse(text) as Token;
