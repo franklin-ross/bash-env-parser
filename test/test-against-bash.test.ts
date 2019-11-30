@@ -1,23 +1,29 @@
 import bashEcho from "./bash-echo";
-import parse from "../dist";
+import parse from "../";
 import { Environment } from "../src/tokens";
 
 const env = {
-  BOB: "hello",
-  JILL: "there"
+  WORD: "hello",
+  INTERNAL_SPACES: "hello with internal   spaces",
+  SPACES: " hello with   spaces  "
 };
 
 describe("output matches bash", () => {
-  const cases = ["$BOB", "${JILL}", " $BOB\t", " $BOB\t", "'$BOB'"];
+  const fallbackCases = ["", "fallback", "fallback with   spaces"];
+  const cases = [
+    ...variablePermutations("WORD", fallbackCases),
+    ...variablePermutations("INTERNAL_SPACES", fallbackCases),
+    ...variablePermutations("SPACES", fallbackCases)
+  ];
   cases.forEach(input => it(input, () => testAgainstBash(input, env)));
 });
 
-describe("bash has substitution failures", () => {
+describe("doesn't parse variables when bash has substitution failures", () => {
   const cases = ["${ BOB}", "${BOB\t}"];
   cases.forEach(input =>
-    it(input, () => {
-      expect(() => bashEcho(input, env)).toThrowError("bad substitution");
-    })
+    it(input, () =>
+      expect(() => bashEcho(input, env)).toThrowError("bad substitution")
+    )
   );
 });
 
@@ -26,4 +32,19 @@ function testAgainstBash(input: string, env: Environment) {
   const parsed = parse(input);
   const output = parsed.stringify(env);
   expect(output).toBe(bashOut);
+}
+
+function variablePermutations(variable: string, fallbacks: string[]) {
+  const results = [
+    ...quotePermutations("$" + variable),
+    ...quotePermutations("${" + variable + "}")
+  ];
+  for (const fallback of fallbacks) {
+    results.push(...quotePermutations("${" + variable + ":-" + fallback + "}"));
+  }
+  return results;
+}
+
+function quotePermutations(text: string) {
+  return [text, '"' + text + '"', "'" + text + "'"];
 }
