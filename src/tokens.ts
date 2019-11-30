@@ -19,12 +19,22 @@ export class Variable {
     public readonly fallback: null | Token = null
   ) {}
 
-  stringify(env: Environment): string {
-    let value = env[this.name];
-    if (!value && this.fallback) {
-      value = this.fallback.stringify(env);
+  stringify(env: Environment, collapseWhitespace: boolean = true): string {
+    const value = env[this.name];
+    if (!value) {
+      if (this.fallback) {
+        return this.fallback.stringify(env, collapseWhitespace);
+      } else {
+        return "";
+      }
     }
-    return value || "";
+    return collapseWhitespace ? value.trim().replace(/\s+/g, " ") : value;
+  }
+
+  toString() {
+    return (
+      "${" + this.name + (this.fallbackType || "") + (this.fallback || "") + "}"
+    );
   }
 }
 
@@ -37,10 +47,14 @@ export class QuotedString {
   stringify(env: Environment): string {
     return this.contents.reduce<string>((text, next) => {
       if (typeof next !== "string") {
-        next = next.stringify(env);
+        next = next.stringify(env, false);
       }
       return text + next;
     }, "");
+  }
+
+  toString() {
+    return `"${this.contents}"`;
   }
 }
 
@@ -51,8 +65,12 @@ export class VerbatimString {
   readonly kind: TokenKind.LiteralText = TokenKind.LiteralText;
   constructor(public readonly contents: string) {}
 
-  stringify(env: Environment): string {
+  stringify(): string {
     return this.contents;
+  }
+
+  toString() {
+    return `'${this.contents}'`;
   }
 }
 
@@ -61,8 +79,12 @@ export class Word {
   readonly kind: TokenKind.Text = TokenKind.Text;
   constructor(public readonly contents: string) {}
 
-  stringify(env: Environment): string {
+  stringify(): string {
     return this.contents;
+  }
+
+  toString() {
+    return `(${this.contents})`;
   }
 }
 
@@ -72,8 +94,12 @@ export class Whitespace {
   readonly kind: TokenKind.Whitespace = TokenKind.Whitespace;
   constructor(public readonly contents: string) {}
 
-  stringify(env: Environment): string {
-    return this.contents;
+  stringify(env: Environment, collapseWhitespace: boolean = true): string {
+    return collapseWhitespace ? " " : this.contents;
+  }
+
+  toString() {
+    return `(${this.contents})`;
   }
 }
 
@@ -88,22 +114,27 @@ export class List {
 
   /** Converts the contained items into a string, collapsing any internal whitespace down to single
    * spaces. Whitespace at the start and end is trimmed, unless it's quoted. */
-  stringify(env: Environment): string {
+  stringify(env: Environment, collapseWhitespace: boolean = true): string {
     const items = this.items;
     const last = items.length - 1;
     let text = "";
-    let i = items[0].kind === TokenKind.Whitespace ? 1 : 0;
+    let i =
+      collapseWhitespace && items[0].kind === TokenKind.Whitespace ? 1 : 0;
     for (; i < last; ++i) {
       const item = items[i];
-      text += item.kind === TokenKind.Whitespace ? " " : item.stringify(env);
+      text += item.stringify(env, collapseWhitespace);
     }
     if (last >= 0) {
       const item = items[i];
-      if (item.kind !== TokenKind.Whitespace) {
-        text += item.stringify(env);
+      if (!collapseWhitespace || item.kind !== TokenKind.Whitespace) {
+        text += item.stringify(env, collapseWhitespace);
       }
     }
     return text;
+  }
+
+  toString() {
+    return `[${this.items}]`;
   }
 }
 

@@ -1,5 +1,6 @@
 {
-  const { QuotedString, VerbatimString, Variable, Word, List, Whitespace } = require('./tokens')
+  const { QuotedString, VerbatimString, Variable, Word, List, Whitespace } = require('./tokens');
+  const { collapse } = require('./parser-helpers');
 }
 
 start = tokens:RootToken* { return new List(tokens); }
@@ -12,6 +13,7 @@ Variable
   }
   / "${" name:VarName "}" { return new Variable(name); }
   / "$" name:VarName { return new Variable(name); }
+  / "$" { return new VerbatimString("$"); }
 
 Fallback
   = tokens:(VerbatimString / QuotedString / Variable / WordInBrace / Whitespace)* {
@@ -23,21 +25,24 @@ VarName "variable name"
 
 Whitespace = [ \t\n\r]+ { return new Whitespace(text()); }
 
-VerbatimString = "'" chars:SingleStringChar* "'" {
-    return new VerbatimString(chars.join(""));
+VerbatimString = "'" chars:VerbatimChars "'" {
+    return new VerbatimString(chars);
   }
 
-QuotedString = '"' chars:(Variable / DoubleStringChar+)* '"' {
-    return new QuotedString(chars);
+QuotedString = '"' tokens:(QuotedChars / Variable)* '"' {
+    return new QuotedString(tokens);
   }
 
-Word = chars:BareStringChar+ { return new Word(chars.join("")); }
+Word = BareStringChar+ { return new Word(text()); }
 
-WordInBrace = chars:BraceStringChar+ { return new Word(chars.join("")); }
+WordInBrace = BraceStringChar+ { return new Word(text()); }
+
+VerbatimChars = SingleStringChar+ { return text(); }
+QuotedChars = DoubleStringChar+ { return text(); }
 
 DoubleStringChar
   = '\\' escaped:("$" / '"') { return escaped; }
-  / !'"' char:. { return char; }
+  / !("$" / '"') char:. { return char; }
 
 SingleStringChar
   = "\\" escaped:("'") { return escaped; }
@@ -45,8 +50,8 @@ SingleStringChar
 
 BraceStringChar
   = "\\" escaped:("$" / "}") { return escaped; }
-  / !("}" / Whitespace) char:. { return char; }
+  / !("$" / "}" / Whitespace) char:. { return char; }
 
 BareStringChar
   = "\\" escaped:("$") { return escaped; }
-  / !Whitespace char:. { return char; }
+  / !("$" / Whitespace) char:. { return char; }

@@ -3,18 +3,21 @@ import parse from "../";
 import { Environment } from "../src/tokens";
 
 const env = {
-  WORD: "hello",
-  INTERNAL_SPACES: "hello with internal   spaces",
-  SPACES: " hello with   spaces  "
+  WORD: "variable",
+  INTERNAL_SPACES: "variable with internal   spaces",
+  OUTER_SPACES: " variable-with-outer-spaces    "
 };
 
 describe("output matches bash", () => {
   const fallbackCases = ["", "fallback", "fallback with   spaces"];
-  const cases = [
-    ...variablePermutations("WORD", fallbackCases),
-    ...variablePermutations("INTERNAL_SPACES", fallbackCases),
-    ...variablePermutations("SPACES", fallbackCases)
-  ];
+  const cases = flatten([
+    Object.keys(env).map(name => variablePermutations(name, fallbackCases)),
+    quotePermutations("concat$WORD"),
+    quotePermutations("${NONE:-this   is ${NONE}}"),
+    quotePermutations("${NONE:-this   is ${NONE:-   $WORD}}"),
+    '${NONE:-   "  $INTERNAL_SPACES "}'
+  ]);
+
   cases.forEach(input => it(input, () => testAgainstBash(input, env)));
 });
 
@@ -35,16 +38,22 @@ function testAgainstBash(input: string, env: Environment) {
 }
 
 function variablePermutations(variable: string, fallbacks: string[]) {
-  const results = [
-    ...quotePermutations("$" + variable),
-    ...quotePermutations("${" + variable + "}")
+  return [
+    quotePermutations("$" + variable),
+    quotePermutations("${" + variable + "}"),
+    fallbacks.map(f => quotePermutations("${" + variable + ":-" + f + "}"))
   ];
-  for (const fallback of fallbacks) {
-    results.push(...quotePermutations("${" + variable + ":-" + fallback + "}"));
-  }
-  return results;
 }
 
 function quotePermutations(text: string) {
   return [text, '"' + text + '"', "'" + text + "'"];
+}
+
+export interface RecursiveArray<T> extends Array<T | RecursiveArray<T>> {}
+
+function flatten(arr: RecursiveArray<string>): string[] {
+  return arr.reduce(
+    (acc: string[], val) => acc.concat(Array.isArray(val) ? flatten(val) : val),
+    []
+  );
 }
