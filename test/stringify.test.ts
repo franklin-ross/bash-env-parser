@@ -1,5 +1,4 @@
-import parse from ".";
-import { Environment } from "./tokens";
+import parse, { Environment } from "../";
 
 const cases: [string, Environment, string][] = [
   ["$BOB", { BOB: "hey  there" }, "hey  there"],

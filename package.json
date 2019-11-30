@@ -4,8 +4,8 @@
   "description": "Parse bash style environment variable replacements, with default values.",
   "main": "dist/index.js",
   "scripts": {
+    "pretest": "npm run build",
     "test": "jest",
-    "pretest": "node ops/generate-test-cases.js > test/test-cases.json",
     "prebuild": "pegjs -o dist/parser.pegjs.js src/parser.pegjs",
     "build": "tsc -p tsconfig.build.json"
   },

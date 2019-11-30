@@ -1,5 +1,9 @@
-import parse from ".";
-import { StringToken, VariableToken, Token, QuotedStringToken } from "./tokens";
+import parse, {
+  StringToken,
+  VariableToken,
+  Token,
+  QuotedStringToken
+} from "../";
 
 const cases: [string, Token][] = [
   ["$BOB", new VariableToken("BOB")],
