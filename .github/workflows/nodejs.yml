@@ -19,7 +19,7 @@ jobs:
       - name: npm install and test
         run: |
           npm ci
-          bpm build
+          npm build
           npm test
         env:
           CI: true
