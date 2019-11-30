@@ -59,6 +59,3 @@ typings/
 
 # next.js build output
 .next
-
-# Generated intermediate files
-src/parser.pegjs.js
