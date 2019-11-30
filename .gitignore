@@ -60,5 +60,5 @@ typings/
 # next.js build output
 .next
 
-# Generated test output
-test/test-cases.json
+# Generated intermediate files
+src/parser.pegjs.js

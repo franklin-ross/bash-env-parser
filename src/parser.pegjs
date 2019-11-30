@@ -9,10 +9,10 @@ start
 String = QuotedString / UnquotedString
 
 EnvVar
-  = "${" _ name:VarName _ fallbackType:(":-" / ":=") fallback:FallbackValue "}" {
+  = "${" name:VarName fallbackType:(":-" / ":=") fallback:FallbackValue "}" {
     return new VariableToken(name, fallbackType, fallback);
   }
-  / "${" _ name:VarName _ "}" { return new VariableToken(name); }
+  / "${" name:VarName "}" { return new VariableToken(name); }
   / "$" name:VarName { return new VariableToken(name); }
   / "$" { return "$"; }
 

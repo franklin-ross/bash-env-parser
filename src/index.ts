@@ -1,7 +1,5 @@
-import { Parser } from "pegjs";
 import { Token } from "./tokens";
-
-const parser = require("./parser.pegjs") as Parser;
+import parser from "./parser.pegjs";
 
 export * from "./tokens";
 
