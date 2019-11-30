@@ -1,5 +1,4 @@
-const { promisify } = require("util");
-const exec = promisify(require("child_process").exec);
+const { spawnSync } = require("child_process");
 
 const env = {
   PATH: process.env.PATH,
@@ -7,20 +6,33 @@ const env = {
   JILL: "there"
 };
 
-const commands = ["echo $BOB", "echo ${BOB}"];
+const commands = ["echo $BOB", "echo ${JILL}"];
 
 const writeResults = async () => {
   const results = [];
-  // Call each command with bash and collect the results.
-  for (const command of commands) {
-    const { stdout, stderr } = await exec(command, { shell: "bash", env });
-    results.push({ command, stdout, stderr });
+  try {
+    // Call each command with bash and collect the results.
+    for (const command of commands) {
+      // Use spawn so we can use bash on Windows without "/d /s /c" arguments on Node 10.
+      const { stdout, stderr } = spawnSync("bash", ["-c", command], {
+        timeout: 10000,
+        encoding: "utf8",
+        env,
+        windowsHide: true
+      });
+      results.push({ command, stdout, stderr });
+    }
+    // Write the collected results to stdout as a JSON object.
+    await new Promise((resolve, reject) => {
+      const result = JSON.stringify(results, null, 2);
+      resolve(process.stdout.write(result, reject));
+    });
+  } catch (err) {
+    console.error(err);
+    process.exit(1);
   }
-  // Write the collected results to stdout as a JSON object.
-  await new Promise((resolve, reject) => {
-    const result = JSON.stringify(results, null, 2);
-    resolve(process.stdout.write(result, reject));
-  });
+
+  return results;
 };
 
 writeResults();
