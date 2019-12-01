@@ -116,47 +116,32 @@ export class List {
     >
   ) {}
 
-  /** Converts the contained items into a string, collapsing any internal whitespace down to single
-   * spaces. Whitespace at the start and end is trimmed, unless it's quoted. */
+  /** Converts the contained items into a string, with support for collapsing whitespace around
+   * "words". */
   stringify(env: Environment, collapseWhitespace: boolean = true): string {
-    const items = this.items;
-    let last = items.length - 1;
-    let text = "";
-    let i = 0;
-    collapseOuterWhitespace();
-    for (; i <= last; ++i) {
-      const item = items[i];
-      let next = item.stringify(env, collapseWhitespace);
-      if (next === null) {
-        next = "";
-        collapseInnerWhitespace();
-      }
-      text += next;
-    }
-    return text;
+    if (collapseWhitespace) {
+      let lastWasWs = false;
+      return this.items.reduce((text: string, token) => {
+        if (token.kind === TokenKind.Whitespace) {
+          lastWasWs = true;
+          return text;
+        }
 
-    function collapseOuterWhitespace() {
-      if (collapseWhitespace) {
-        while (i < last && items[i].kind === TokenKind.Whitespace) {
-          ++i;
+        const next = token.stringify(env, true);
+        if (next === null) return text;
+
+        if (lastWasWs && text !== "") {
+          text += " ";
         }
-        while (i < last && items[last].kind === TokenKind.Whitespace) {
-          --last;
-        }
-      }
+        lastWasWs = false;
+        return text + token;
+      }, "");
     }
 
-    function collapseInnerWhitespace() {
-      if (
-        collapseWhitespace &&
-        i > 0 &&
-        i < last &&
-        items[i - 1].kind === TokenKind.Whitespace &&
-        items[i + 1].kind === TokenKind.Whitespace
-      ) {
-        ++i;
-      }
-    }
+    return this.items
+      .map(token => token.stringify(env, false))
+      .filter(<T>(token: T): token is Exclude<T, null> => token !== null)
+      .join("");
   }
 
   toString() {

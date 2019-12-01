@@ -62,8 +62,8 @@ export declare class List {
     readonly items: ReadonlyArray<Variable | Word | QuotedString | VerbatimString | Whitespace>;
     readonly kind: TokenKind.List;
     constructor(items: ReadonlyArray<Variable | Word | QuotedString | VerbatimString | Whitespace>);
-    /** Converts the contained items into a string, collapsing any internal whitespace down to single
-     * spaces. Whitespace at the start and end is trimmed, unless it's quoted. */
+    /** Converts the contained items into a string, with support for collapsing whitespace around
+     * "words". */
     stringify(env: Environment, collapseWhitespace?: boolean): string;
     toString(): string;
 }

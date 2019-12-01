@@ -1,6 +1,5 @@
 import bashEcho from "./bash-echo";
-import parse from "../";
-import { Environment } from "../src/tokens";
+import parse, { Environment } from "../";
 
 const env = {
   EMPTY: "", // Should correctly handle variables set to the empty string
@@ -14,11 +13,14 @@ describe("output matches bash", () => {
   const cases = flatten([
     Object.keys(env).map(name => variablePermutations(name, fallbackCases)),
     // $WORD should be detected despite text run-on
-    quotePermutations("concat$WORD"),
+    quotePermutations("run${WORD}on"),
     // Whitespace around ${NONE} should collapse unless quoted
     quotePermutations("this is ${NONE} good"),
     // Quoted whitespace should not collapse around ${NONE}
     "\" \"${NONE}' '",
+    // $NONE and whitespace at the start/end should collapse
+    "$NONE 'hello'",
+    "'hello' $NONE",
     // Nested variables should correctly collapse whitespace
     quotePermutations("${NONE:-this   is ${NONE:-   $OUTER_SPACES\t}}"),
 
