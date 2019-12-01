@@ -1,4 +1,4 @@
-export enum TokenKind {
+export const enum TokenKind {
   List,
   Whitespace,
   Variable,

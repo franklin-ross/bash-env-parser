@@ -1,21 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var TokenKind;
-(function (TokenKind) {
-    TokenKind[TokenKind["List"] = 0] = "List";
-    TokenKind[TokenKind["Whitespace"] = 1] = "Whitespace";
-    TokenKind[TokenKind["Variable"] = 2] = "Variable";
-    TokenKind[TokenKind["Text"] = 3] = "Text";
-    TokenKind[TokenKind["QuotedText"] = 4] = "QuotedText";
-    TokenKind[TokenKind["LiteralText"] = 5] = "LiteralText";
-})(TokenKind = exports.TokenKind || (exports.TokenKind = {}));
 /** A variable reference like $VAR, ${VAR}, or ${VAR:-fallback}. */
 class Variable {
     constructor(name, fallbackType = null, fallback = null) {
         this.name = name;
         this.fallbackType = fallbackType;
         this.fallback = fallback;
-        this.kind = TokenKind.Variable;
+        this.kind = 2 /* Variable */;
     }
     stringify(env, collapseWhitespace = true) {
         const value = env[this.name];
@@ -39,7 +30,7 @@ exports.Variable = Variable;
 class QuotedString {
     constructor(contents) {
         this.contents = contents;
-        this.kind = TokenKind.QuotedText;
+        this.kind = 4 /* QuotedText */;
     }
     stringify(env) {
         return this.contents.reduce((text, next) => {
@@ -60,7 +51,7 @@ exports.QuotedString = QuotedString;
 class VerbatimString {
     constructor(contents) {
         this.contents = contents;
-        this.kind = TokenKind.LiteralText;
+        this.kind = 5 /* LiteralText */;
     }
     stringify() {
         return this.contents;
@@ -74,7 +65,7 @@ exports.VerbatimString = VerbatimString;
 class Word {
     constructor(contents) {
         this.contents = contents;
-        this.kind = TokenKind.Text;
+        this.kind = 3 /* Text */;
     }
     stringify() {
         return this.contents;
@@ -89,7 +80,7 @@ exports.Word = Word;
 class Whitespace {
     constructor(contents) {
         this.contents = contents;
-        this.kind = TokenKind.Whitespace;
+        this.kind = 1 /* Whitespace */;
     }
     stringify(env, collapseWhitespace = true) {
         return collapseWhitespace ? " " : this.contents;
@@ -104,7 +95,7 @@ exports.Whitespace = Whitespace;
 class List {
     constructor(items) {
         this.items = items;
-        this.kind = TokenKind.List;
+        this.kind = 0 /* List */;
     }
     /** Converts the contained items into a string, collapsing any internal whitespace down to single
      * spaces. Whitespace at the start and end is trimmed, unless it's quoted. */
@@ -126,10 +117,10 @@ class List {
         return text;
         function collapseOuterWhitespace() {
             if (collapseWhitespace) {
-                while (i < last && items[i].kind === TokenKind.Whitespace) {
+                while (i < last && items[i].kind === 1 /* Whitespace */) {
                     ++i;
                 }
-                while (i < last && items[last].kind === TokenKind.Whitespace) {
+                while (i < last && items[last].kind === 1 /* Whitespace */) {
                     --last;
                 }
             }
@@ -138,8 +129,8 @@ class List {
             if (collapseWhitespace &&
                 i > 0 &&
                 i < last &&
-                items[i - 1].kind === TokenKind.Whitespace &&
-                items[i + 1].kind === TokenKind.Whitespace) {
+                items[i - 1].kind === 1 /* Whitespace */ &&
+                items[i + 1].kind === 1 /* Whitespace */) {
                 ++i;
             }
         }
