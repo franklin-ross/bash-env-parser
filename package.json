@@ -1,7 +1,7 @@
 {
   "name": "bash-env-parser",
   "version": "0.1.0",
-  "description": "Parse/replace bash style variables with default values.",
+  "description": "Parse/replace bash style variables substitutions with support for default values.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
