@@ -1,7 +1,7 @@
 const { spawnSync } = require("child_process");
 
 /** Runs `bash -c echo input` and returns the result. Throws stderr if that is not empty. */
-export default (input: string, env: object) => {
+module.exports = (input, env) => {
   // Use spawn so we can use bash on Windows without "/d /s /c" arguments on Node 10.
   const { stdout, stderr } = spawnSync("bash", ["-c", `echo ${input}`], {
     timeout: 5000,

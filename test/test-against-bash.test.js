@@ -1,5 +1,7 @@
-import bashEcho from "./bash-echo";
-import parse, { Environment } from "../";
+// These tests are written in plain node compatible JS to ensure it works with that.
+
+const bashEcho = require("./bash-echo");
+const { parse } = require("../");
 
 const env = {
   EMPTY: "", // Should correctly handle variables set to the empty string
@@ -9,7 +11,7 @@ const env = {
 };
 
 describe("output matches bash", () => {
-  const fallbackCases = ["", "fallback", "fallback with   spaces"];
+  const fallbackCases = ["", "fallback", "fallback with  spaces"];
   const cases = flatten([
     Object.keys(env).map(name => variablePermutations(name, fallbackCases)),
     // $WORD should be detected despite text run-on
@@ -39,7 +41,7 @@ describe("doesn't parse variables when bash has substitution failures", () => {
   );
 });
 
-function testAgainstBash(input: string, env: Environment) {
+function testAgainstBash(input, env) {
   const bashOut = bashEcho(input, env);
   const parsed = parse(input);
   const output = parsed.stringify(env);
@@ -50,7 +52,7 @@ function testAgainstBash(input: string, env: Environment) {
   expect(output).toBe(bashOut);
 }
 
-function variablePermutations(variable: string, fallbacks: string[]) {
+function variablePermutations(variable, fallbacks) {
   return [
     quotePermutations("$" + variable),
     quotePermutations("${" + variable + "}"),
@@ -58,15 +60,13 @@ function variablePermutations(variable: string, fallbacks: string[]) {
   ];
 }
 
-function quotePermutations(text: string) {
+function quotePermutations(text) {
   return [text, '"' + text + '"', "'" + text + "'"];
 }
 
-export interface RecursiveArray<T> extends Array<T | RecursiveArray<T>> {}
-
-function flatten(arr: RecursiveArray<string>): string[] {
+function flatten(arr) {
   return arr.reduce(
-    (acc: string[], val) => acc.concat(Array.isArray(val) ? flatten(val) : val),
+    (acc, val) => acc.concat(Array.isArray(val) ? flatten(val) : val),
     []
   );
 }
