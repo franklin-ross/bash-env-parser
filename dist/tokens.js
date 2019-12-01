@@ -1,5 +1,5 @@
 "use strict";
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 var TokenKind;
 (function (TokenKind) {
     TokenKind[TokenKind["List"] = 0] = "List";
@@ -10,18 +10,15 @@ var TokenKind;
     TokenKind[TokenKind["LiteralText"] = 5] = "LiteralText";
 })(TokenKind = exports.TokenKind || (exports.TokenKind = {}));
 /** A variable reference like $VAR, ${VAR}, or ${VAR:-fallback}. */
-var Variable = /** @class */ (function () {
-    function Variable(name, fallbackType, fallback) {
-        if (fallbackType === void 0) { fallbackType = null; }
-        if (fallback === void 0) { fallback = null; }
+class Variable {
+    constructor(name, fallbackType = null, fallback = null) {
         this.name = name;
         this.fallbackType = fallbackType;
         this.fallback = fallback;
         this.kind = TokenKind.Variable;
     }
-    Variable.prototype.stringify = function (env, collapseWhitespace) {
-        if (collapseWhitespace === void 0) { collapseWhitespace = true; }
-        var value = env[this.name];
+    stringify(env, collapseWhitespace = true) {
+        const value = env[this.name];
         if (!value) {
             if (this.fallback) {
                 return this.fallback.stringify(env, collapseWhitespace);
@@ -31,102 +28,95 @@ var Variable = /** @class */ (function () {
             }
         }
         return collapseWhitespace ? value.trim().replace(/\s+/g, " ") : value;
-    };
-    Variable.prototype.toString = function () {
+    }
+    toString() {
         return ("${" + this.name + (this.fallbackType || "") + (this.fallback || "") + "}");
-    };
-    return Variable;
-}());
+    }
+}
 exports.Variable = Variable;
 /** Text quoted with double quotes: ". Variables substitution is performed in these strings and
  * whitespace is preserved, but no other characters like ' have any special meaning. */
-var QuotedString = /** @class */ (function () {
-    function QuotedString(contents) {
+class QuotedString {
+    constructor(contents) {
         this.contents = contents;
         this.kind = TokenKind.QuotedText;
     }
-    QuotedString.prototype.stringify = function (env) {
-        return this.contents.reduce(function (text, next) {
+    stringify(env) {
+        return this.contents.reduce((text, next) => {
             if (typeof next !== "string") {
                 next = next.stringify(env, false) || ""; // Surrounding whitespace doesn't ever collapse
             }
             return text + next;
         }, "");
-    };
-    QuotedString.prototype.toString = function () {
-        return "\"" + this.contents + "\"";
-    };
-    return QuotedString;
-}());
+    }
+    toString() {
+        return `"${this.contents}"`;
+    }
+}
 exports.QuotedString = QuotedString;
 /** Text quoted with single quotes: '. No variable substitution is performed in these strings,
  * whitespace is preserved, and no other characters have special meaning (like double quotes), so
  * the contents are used verbatim. */
-var VerbatimString = /** @class */ (function () {
-    function VerbatimString(contents) {
+class VerbatimString {
+    constructor(contents) {
         this.contents = contents;
         this.kind = TokenKind.LiteralText;
     }
-    VerbatimString.prototype.stringify = function () {
+    stringify() {
         return this.contents;
-    };
-    VerbatimString.prototype.toString = function () {
-        return "'" + this.contents + "'";
-    };
-    return VerbatimString;
-}());
+    }
+    toString() {
+        return `'${this.contents}'`;
+    }
+}
 exports.VerbatimString = VerbatimString;
 /** An unquoted word containing no whitespace. */
-var Word = /** @class */ (function () {
-    function Word(contents) {
+class Word {
+    constructor(contents) {
         this.contents = contents;
         this.kind = TokenKind.Text;
     }
-    Word.prototype.stringify = function () {
+    stringify() {
         return this.contents;
-    };
-    Word.prototype.toString = function () {
-        return "(" + this.contents + ")";
-    };
-    return Word;
-}());
+    }
+    toString() {
+        return `(${this.contents})`;
+    }
+}
 exports.Word = Word;
 /** Some whitespace between words, variables, or quoted strings. This is generally either stripped
  * or collapsed. */
-var Whitespace = /** @class */ (function () {
-    function Whitespace(contents) {
+class Whitespace {
+    constructor(contents) {
         this.contents = contents;
         this.kind = TokenKind.Whitespace;
     }
-    Whitespace.prototype.stringify = function (env, collapseWhitespace) {
-        if (collapseWhitespace === void 0) { collapseWhitespace = true; }
+    stringify(env, collapseWhitespace = true) {
         return collapseWhitespace ? " " : this.contents;
-    };
-    Whitespace.prototype.toString = function () {
-        return "(" + this.contents + ")";
-    };
-    return Whitespace;
-}());
+    }
+    toString() {
+        return `(${this.contents})`;
+    }
+}
 exports.Whitespace = Whitespace;
 /** A list of tokens, including whitespace. Handles most of the rules for collapsing whitespace
  * based on context. */
-var List = /** @class */ (function () {
-    function List(items) {
+class List {
+    constructor(items) {
         this.items = items;
         this.kind = TokenKind.List;
     }
     /** Converts the contained items into a string, collapsing any internal whitespace down to single
      * spaces. Whitespace at the start and end is trimmed, unless it's quoted. */
-    List.prototype.stringify = function (env, collapseWhitespace) {
-        if (collapseWhitespace === void 0) { collapseWhitespace = true; }
-        var items = this.items;
-        var last = items.length - 1;
-        var text = "";
-        var i = 0;
+    stringify(env, collapseWhitespace = true) {
+        const items = this.items;
+        let last = items.length - 1;
+        let text = "";
+        let i = 0;
         collapseOuterWhitespace();
         for (; i <= last; ++i) {
-            var item = items[i];
-            var next = item.stringify(env, collapseWhitespace);
+            const item = items[i];
+            let next = item.stringify(env, collapseWhitespace);
             if (next === null) {
                 next = "";
                 collapseInnerWhitespace();
@@ -153,10 +143,9 @@ var List = /** @class */ (function () {
                 ++i;
             }
         }
-    };
-    List.prototype.toString = function () {
-        return "[" + this.items + "]";
-    };
-    return List;
-}());
+    }
+    toString() {
+        return `[${this.items}]`;
+    }
+}
 exports.List = List;

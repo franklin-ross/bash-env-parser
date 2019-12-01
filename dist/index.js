@@ -5,8 +5,8 @@ function __export(m) {
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-exports.__esModule = true;
-var parser_pegjs_1 = __importDefault(require("./parser.pegjs"));
+Object.defineProperty(exports, "__esModule", { value: true });
+const parser_pegjs_1 = __importDefault(require("./parser.pegjs"));
 __export(require("./tokens"));
 /** Parses the text for bash style environment variables. */
-exports["default"] = (function (text) { return parser_pegjs_1["default"].parse(text); });
+exports.default = (text) => parser_pegjs_1.default.parse(text);
