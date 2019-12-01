@@ -1,7 +1,52 @@
 # bash-env-parser
 
-Parse/replace bash style variables substitutions with support for default
-values.
+Parse/replace bash style variable substitutions with support for default values.
+
+## Install
+
+`npm install franklin-ross/bash-env-parser`
+
+I'll publish an npm package soon after some feedback.
+
+## Examples
+
+```js
+import { replace } from "bash-env-parser";
+
+const env = {
+  FOO: "bar",
+  NAME: "Franklin Ross"
+  INDENT: "    "
+};
+
+expect(replace("$FOO", env).toBe("bar");
+expect(replace("${DEFAULT:-${VALUES:-Defaults!}}", env)
+         .toBe("Defaults!");
+expect(replace("Hi, my name is $NAME", env)
+         .toBe("Hi, my name is Franklin Ross");
+expect(replace('  Spaces    to  \t collapse', env)
+         .toBe('Spaces to collapse');
+expect(replace('Double quotes "to${INDENT}work"', env)
+         .toBe('Double quotes to    work');
+expect(replace("Single quotes 'to   work $FOO'", env)
+         .toBe("Single quotes to   work $FOO");
+```
+
+It's also possible to get the parse tree for inspection. If you want to parse an
+expression and then convert it into a string multiple times with different
+environments, it's also more efficient to split the parse and stringify steps.
+
+```js
+import { parse } from "bash-env-parser";
+
+const syntaxTree = parse("My $EXPRESSION");
+syntaxTree.stringify({ EXPRESSION: "doughnut" });
+```
+
+## Accuracy
+
+This is intended to have identical behaviour to bash. File an issue if you find
+that's not the case.
 
 ## Prior Art
 
