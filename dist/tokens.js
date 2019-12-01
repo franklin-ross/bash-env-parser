@@ -114,7 +114,7 @@ class List {
                     text += " ";
                 }
                 lastWasWs = false;
-                return text + token;
+                return text + next;
             }, "");
         }
         return this.items
@@ -127,3 +127,4 @@ class List {
     }
 }
 exports.List = List;
+//# sourceMappingURL=tokens.js.map

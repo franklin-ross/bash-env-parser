@@ -10,3 +10,4 @@ const parser_pegjs_1 = __importDefault(require("./parser.pegjs"));
 __export(require("./tokens"));
 /** Parses the text for bash style environment variables. */
 exports.default = (text) => parser_pegjs_1.default.parse(text);
+//# sourceMappingURL=index.js.map

@@ -134,7 +134,7 @@ export class List {
           text += " ";
         }
         lastWasWs = false;
-        return text + token;
+        return text + next;
       }, "");
     }
 
