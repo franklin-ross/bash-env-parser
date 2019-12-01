@@ -1,6 +1,5 @@
 {
   const { QuotedString, VerbatimString, Variable, Word, List, Whitespace } = require('./tokens');
-  const { collapse } = require('./parser-helpers');
 }
 
 start = tokens:RootToken* { return new List(tokens); }

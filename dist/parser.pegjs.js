@@ -1163,7 +1163,6 @@ function peg$parse(input, options) {
 
 
     const { QuotedString, VerbatimString, Variable, Word, List, Whitespace } = require('./tokens');
-    const { collapse } = require('./parser-helpers');
 
 
   peg$result = peg$startRuleFunction();
