@@ -7,8 +7,8 @@ export enum TokenKind {
   LiteralText
 }
 
-/** A map of variables which can be replaced by Variable. */
-export type Environment = { [envVarName: string]: string };
+/** A map of variables which can be substituted. */
+export type Environment = { [envVarName: string]: string | null | undefined };
 
 /** A variable reference like $VAR, ${VAR}, or ${VAR:-fallback}. */
 export class Variable {
@@ -19,13 +19,16 @@ export class Variable {
     public readonly fallback: null | Token = null
   ) {}
 
-  stringify(env: Environment, collapseWhitespace: boolean = true): string {
+  stringify(
+    env: Environment,
+    collapseWhitespace: boolean = true
+  ): null | string {
     const value = env[this.name];
     if (!value) {
       if (this.fallback) {
         return this.fallback.stringify(env, collapseWhitespace);
       } else {
-        return "";
+        return null;
       }
     }
     return collapseWhitespace ? value.trim().replace(/\s+/g, " ") : value;
@@ -47,7 +50,7 @@ export class QuotedString {
   stringify(env: Environment): string {
     return this.contents.reduce<string>((text, next) => {
       if (typeof next !== "string") {
-        next = next.stringify(env, false);
+        next = next.stringify(env, false) || ""; // Surrounding whitespace doesn't ever collapse
       }
       return text + next;
     }, "");
@@ -103,7 +106,8 @@ export class Whitespace {
   }
 }
 
-/** A list of tokens, including whitespace. */
+/** A list of tokens, including whitespace. Handles most of the rules for collapsing whitespace
+ * based on context. */
 export class List {
   readonly kind: TokenKind.List = TokenKind.List;
   constructor(
@@ -117,22 +121,42 @@ export class List {
   stringify(env: Environment, collapseWhitespace: boolean = true): string {
     const items = this.items;
     let last = items.length - 1;
-    if (last < 0) return "";
     let text = "";
     let i = 0;
-    if (collapseWhitespace) {
-      while (i < last && items[i].kind === TokenKind.Whitespace) {
-        ++i;
-      }
-      while (i < last && items[last].kind === TokenKind.Whitespace) {
-        --last;
-      }
-    }
-    for (; i < last; ++i) {
+    collapseOuterWhitespace();
+    for (; i <= last; ++i) {
       const item = items[i];
-      text += item.stringify(env, collapseWhitespace);
+      let next = item.stringify(env, collapseWhitespace);
+      if (next === null) {
+        next = "";
+        collapseInnerWhitespace();
+      }
+      text += next;
     }
     return text;
+
+    function collapseOuterWhitespace() {
+      if (collapseWhitespace) {
+        while (i < last && items[i].kind === TokenKind.Whitespace) {
+          ++i;
+        }
+        while (i < last && items[last].kind === TokenKind.Whitespace) {
+          --last;
+        }
+      }
+    }
+
+    function collapseInnerWhitespace() {
+      if (
+        collapseWhitespace &&
+        i > 0 &&
+        i < last &&
+        items[i - 1].kind === TokenKind.Whitespace &&
+        items[i + 1].kind === TokenKind.Whitespace
+      ) {
+        ++i;
+      }
+    }
   }
 
   toString() {
