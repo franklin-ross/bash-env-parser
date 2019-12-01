@@ -116,19 +116,21 @@ export class List {
    * spaces. Whitespace at the start and end is trimmed, unless it's quoted. */
   stringify(env: Environment, collapseWhitespace: boolean = true): string {
     const items = this.items;
-    const last = items.length - 1;
+    let last = items.length - 1;
+    if (last < 0) return "";
     let text = "";
-    let i =
-      collapseWhitespace && items[0].kind === TokenKind.Whitespace ? 1 : 0;
+    let i = 0;
+    if (collapseWhitespace) {
+      while (i < last && items[i].kind === TokenKind.Whitespace) {
+        ++i;
+      }
+      while (i < last && items[last].kind === TokenKind.Whitespace) {
+        --last;
+      }
+    }
     for (; i < last; ++i) {
       const item = items[i];
       text += item.stringify(env, collapseWhitespace);
-    }
-    if (last >= 0) {
-      const item = items[i];
-      if (!collapseWhitespace || item.kind !== TokenKind.Whitespace) {
-        text += item.stringify(env, collapseWhitespace);
-      }
     }
     return text;
   }
