@@ -18,7 +18,7 @@ export default [
         clean: true // Don't know why, but I get build errors otherwise.
       }),
       pegjs({
-        // I need to use use a require() in the grammar to import the tokens, and can't use es6
+        // I need to use a require() in the grammar to import the tokens, and can't use es6
         // imports because they end up in the middle of the file somewhere which isn't allowed. The
         // pegjs output needs to be entirely in cjs format so the commonjs plugin can convert it to
         // es6 modules. If it contains any es6 module syntax, it won't be converted.
