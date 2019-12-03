@@ -7,7 +7,8 @@
     "sourceMap": true,
     "target": "es2017",
     "lib": ["es2017"],
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "preserveConstEnums": true
   },
   "include": ["src/**.ts"]
 }
