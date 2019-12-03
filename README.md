@@ -48,6 +48,11 @@ syntaxTree.stringify({ EXPRESSION: "doughnut" });
 This is intended to have identical behaviour to bash. File an issue if you find
 that's not the case.
 
+## References
+
+- https://www.gnu.org/software/bash/manual/bash.html
+- http://www.tldp.org/LDP/abs/html/index.html
+
 ## Prior Art
 
 A quick search of the npm package registry nets a fair number of packages which

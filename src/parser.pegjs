@@ -4,7 +4,7 @@
 
 start = tokens:RootToken* { return new List(tokens); }
 
-RootToken = VerbatimString / QuotedString / Variable / Word / Whitespace
+RootToken = VerbatimString / QuotedString / Word / Variable / Whitespace
 
 Variable
   = "${" name:VarName fallbackType:(":-" / ":=") fallback:Fallback "}" {
@@ -15,7 +15,7 @@ Variable
   / "$" { return new VerbatimString("$"); }
 
 Fallback
-  = tokens:(VerbatimString / QuotedString / Variable / WordInBrace / Whitespace)* {
+  = tokens:(VerbatimString / QuotedString / WordInBrace / Variable / Whitespace)* {
     return tokens.length === 1 ? tokens[0] : new List(tokens);
   }
 
@@ -32,25 +32,19 @@ QuotedString = '"' tokens:(QuotedChars / Variable)* '"' {
     return new QuotedString(tokens);
   }
 
-Word = BareStringChar+ { return new Word(text()); }
-
-WordInBrace = BraceStringChar+ { return new Word(text()); }
-
-VerbatimChars = SingleStringChar+ { return text(); }
-QuotedChars = DoubleStringChar+ { return text(); }
+Word = chars:BareStringChar+ { return new Word(chars.join("")); }
+WordInBrace = chars:BraceStringChar+ { return new Word(chars.join("")); }
+VerbatimChars = chars:SingleStringChar+ { return chars.join(""); }
+QuotedChars = chars:DoubleStringChar+ { return chars.join(""); }
 
 DoubleStringChar
-  = '\\' escaped:("$" / '"') { return escaped; }
-  / !("$" / '"') char:. { return char; }
+  = '\\' escaped:[$"`\\] { return escaped; } // https://www.gnu.org/software/bash/manual/bash.html#Double-Quotes
+  / '\\\n' { return ""; }
+  / ![$"] char:. { return char; }
+SingleStringChar = !"'" char:. { return char; }
+BraceStringChar  = Escaped / !("$" / "}" / Whitespace) char:. { return char; }
+BareStringChar   = Escaped / !("$" / Whitespace) char:. { return char; }
 
-SingleStringChar
-  = "\\" escaped:("'") { return escaped; }
-  / !"'" char:. { return char; }
-
-BraceStringChar
-  = "\\" escaped:("$" / "}") { return escaped; }
-  / !("$" / "}" / Whitespace) char:. { return char; }
-
-BareStringChar
-  = "\\" escaped:("$") { return escaped; }
-  / !("$" / Whitespace) char:. { return char; }
+Escaped
+  = '\\\n' { return ""; }
+  / "\\" escaped:. { return escaped; }
