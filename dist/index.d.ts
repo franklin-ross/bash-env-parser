@@ -1,5 +1,7 @@
-import { Token, Environment } from "./tokens";
+import { Token } from "./tokens";
+import { Environment } from "./Environment";
 export * from "./tokens";
+export { Environment } from "./Environment";
 /** Parses the input expression for bash style variables, returning a parse tree. Supports bash
  * style quotes (double and single), and default values.
  * @param expression The input text to parse. Eg: "${NODE_ENV:-${ENV:-prod}}", "My name is $NAME",

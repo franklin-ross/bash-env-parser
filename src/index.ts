@@ -1,6 +1,8 @@
-import { Token, Environment } from "./tokens";
+import { Token } from "./tokens";
+import { Environment } from "./Environment";
 import { parse as parsePeg } from "./parser.pegjs";
 export * from "./tokens";
+export { Environment } from "./Environment";
 
 /** Parses the input expression for bash style variables, returning a parse tree. Supports bash
  * style quotes (double and single), and default values.
