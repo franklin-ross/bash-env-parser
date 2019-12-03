@@ -1,4 +1,4 @@
-import { TokenKind } from "./TokenKind";
+import { TokenKind } from ".";
 /** An unquoted word containing no whitespace. */
 export class Word {
   readonly kind: TokenKind.Text = TokenKind.Text;

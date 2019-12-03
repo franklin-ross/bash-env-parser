@@ -1,6 +1,7 @@
 import { Token } from "./tokens";
 import { Environment } from "./Environment";
 import { parse as parsePeg } from "./parser.pegjs";
+
 export * from "./tokens";
 export { Environment } from "./Environment";
 

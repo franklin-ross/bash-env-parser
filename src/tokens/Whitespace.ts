@@ -1,4 +1,4 @@
-import { TokenKind } from "./TokenKind";
+import { TokenKind } from ".";
 import { Environment } from "../Environment";
 /** Some whitespace between words, variables, or quoted strings. This is generally either stripped
  * or collapsed. */

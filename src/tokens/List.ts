@@ -1,10 +1,12 @@
-import { TokenKind } from "./TokenKind";
 import { Environment } from "../Environment";
-import { Variable } from "./Variable";
-import { QuotedString } from "./QuotedString";
-import { VerbatimString } from "./VerbatimString";
-import { Word } from "./Word";
-import { Whitespace } from "./Whitespace";
+import {
+  TokenKind,
+  Variable,
+  QuotedString,
+  VerbatimString,
+  Word,
+  Whitespace
+} from ".";
 /** A list of tokens, including whitespace. Handles most of the rules for collapsing whitespace
  * based on context. */
 export class List {

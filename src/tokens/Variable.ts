@@ -1,6 +1,5 @@
-import { TokenKind } from "./TokenKind";
 import { Environment } from "../Environment";
-import { Token } from ".";
+import { Token, TokenKind } from ".";
 /** A variable reference like $VAR, ${VAR}, or ${VAR:-fallback}. */
 export class Variable {
   readonly kind: TokenKind.Variable = TokenKind.Variable;
