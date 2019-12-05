@@ -6,7 +6,8 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "test": "jest",
-    "build": "rollup --config"
+    "build": "rollup --config",
+    "watch": "rollup --config --watch"
   },
   "author": "Franklin Ross",
   "license": "MIT",

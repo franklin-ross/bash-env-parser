@@ -1,4 +1,5 @@
 import { TokenKind, VerbatimString, QuotedString, Word, Variable } from ".";
+import { Environment } from "..";
 
 /** A variable assignment like VAR=5, VAR="hello", or VAR=${OTHER}. */
 export class VariableAssignment {
@@ -8,10 +9,8 @@ export class VariableAssignment {
     public readonly value: VerbatimString | QuotedString | Word | Variable
   ) {}
 
-  /** VariableAssignments should be removed from string results, and surrounding whitespace should
-   * collapse. */
-  stringify(): null {
-    return null;
+  stringify(env: Environment, collapseWhitespace: boolean = true) {
+    return `${this.name}=${this.value.stringify(env, collapseWhitespace)}`;
   }
 
   toString() {

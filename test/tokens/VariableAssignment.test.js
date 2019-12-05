@@ -5,7 +5,8 @@ const {
   Word,
   List,
   QuotedString,
-  VerbatimString
+  VerbatimString,
+  TokenKind
 } = require("../../");
 
 describe("tokens.VariableAssignment", () => {
@@ -26,6 +27,18 @@ describe("tokens.VariableAssignment", () => {
       it(expression, () => {
         const parsed = parse(expression);
         expect(parsed).toEqual(new List([result]));
+      })
+    );
+  });
+
+  describe("doesn't parse", () => {
+    const tests = ["VAR= hello", "VAR =hello"];
+    tests.forEach(expression =>
+      it(expression, () => {
+        const parsed = parse(expression);
+        expect(parsed.items.map(x => x.kind)).not.toContain(
+          TokenKind.VariableAssignment
+        );
       })
     );
   });

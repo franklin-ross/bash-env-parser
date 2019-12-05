@@ -1,4 +1,4 @@
-import { Token } from "./tokens";
+import { List } from "./tokens";
 import { Environment } from "./Environment";
 export * from "./tokens";
 export { Environment } from "./Environment";
@@ -7,7 +7,7 @@ export { Environment } from "./Environment";
  * @param expression The input text to parse. Eg: "${NODE_ENV:-${ENV:-prod}}", "My name is $NAME",
  * "And '  quoted' spaces".
  * @returns A parse tree which can be combined with an environment object to generate a string. */
-export declare const parse: (expression: string) => Token;
+export declare const parse: (expression: string) => List;
 /** Replaces environment variables in the input.
  * @param expression The input text. Eg: "${NODE_ENV:-${ENV:-prod}}", "My name is $NAME",
  * "And '  quoted' spaces".
@@ -15,4 +15,4 @@ export declare const parse: (expression: string) => Token;
  * the expression.
  * @returns A string with all environment variables either replaced, or removed if no value could be
  * substituted. */
-export declare const replace: (expression: string, environment: Environment) => string | null;
+export declare const replace: (expression: string, environment: Environment) => string;
