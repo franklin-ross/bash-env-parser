@@ -1,11 +1,11 @@
-import { TokenKind, VerbatimString, QuotedString, Word, Variable } from ".";
+import { TokenKind, List } from ".";
 import { Environment } from "..";
 /** A variable assignment like VAR=5, VAR="hello", or VAR=${OTHER}. */
 export declare class VariableAssignment {
     readonly name: string;
-    readonly value: VerbatimString | QuotedString | Word | Variable;
+    readonly value: List;
     readonly kind: TokenKind.VariableAssignment;
-    constructor(name: string, value: VerbatimString | QuotedString | Word | Variable);
+    constructor(name: string, value: List);
     stringify(env: Environment, collapseWhitespace?: boolean): string;
     toString(): string;
 }
