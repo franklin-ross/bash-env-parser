@@ -14,8 +14,8 @@ start = tokens:(VariableAssignment / WordToken / Whitespace)* { return new List(
 
 WordToken = VerbatimString / QuotedString / Word / Variable
 
-VariableAssignment = name:VarName "=" value:WordToken {
-    return new VariableAssignment(name, value);
+VariableAssignment = name:VarName "=" value:WordToken+ {
+    return new VariableAssignment(name, new List(value));
   }
 
 Variable
