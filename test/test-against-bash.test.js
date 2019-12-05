@@ -42,7 +42,14 @@ describe("output matches bash", () => {
     quotePermutations("\\$WORD"),
     ['\\" Hi \\"', "It\\'s", "\\'  Hi  \\'"],
     // Newlines should be removed when escaped in certain cases.
-    ["a\\\nb", '"a\\\nb"', "'a\\\nb'"]
+    ["a\\\nb", '"a\\\nb"', "'a\\\nb'"],
+    // Variable assignments
+    [
+      ...quotePermutations("hello"),
+      ...quotePermutations("$WORD"),
+      ...quotePermutations("${WORD}"),
+      ...quotePermutations("${WORD:-fallback}")
+    ].map(value => "NEW_VAR=" + value)
   ]);
 
   cases.forEach(input => it(input, () => testAgainstBash(input, env)));

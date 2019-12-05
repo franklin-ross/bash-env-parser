@@ -1,10 +1,22 @@
 {
-  const { QuotedString, VerbatimString, Variable, Word, List, Whitespace } = require('./tokens');
+  const {
+    QuotedString,
+    VerbatimString,
+    Variable,
+    VariableAssignment,
+    Word,
+    List,
+    Whitespace
+  } = require('./tokens');
 }
 
-start = tokens:RootToken* { return new List(tokens); }
+start = tokens:(VariableAssignment / WordToken / Whitespace)* { return new List(tokens); }
 
-RootToken = VerbatimString / QuotedString / Word / Variable / Whitespace
+WordToken = VerbatimString / QuotedString / Word / Variable
+
+VariableAssignment = name:VarName "=" value:WordToken {
+    return new VariableAssignment(name, value);
+  }
 
 Variable
   = "${" name:VarName fallbackType:(":-" / ":=") fallback:Fallback "}" {

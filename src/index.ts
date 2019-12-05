@@ -1,4 +1,4 @@
-import { Token } from "./tokens";
+import { List } from "./tokens";
 import { Environment } from "./Environment";
 import { parse as parsePeg } from "./parser.pegjs";
 
@@ -10,7 +10,7 @@ export { Environment } from "./Environment";
  * @param expression The input text to parse. Eg: "${NODE_ENV:-${ENV:-prod}}", "My name is $NAME",
  * "And '  quoted' spaces".
  * @returns A parse tree which can be combined with an environment object to generate a string. */
-export const parse = (expression: string) => parsePeg(expression) as Token;
+export const parse = (expression: string) => parsePeg(expression) as List;
 
 /** Replaces environment variables in the input.
  * @param expression The input text. Eg: "${NODE_ENV:-${ENV:-prod}}", "My name is $NAME",
@@ -20,6 +20,6 @@ export const parse = (expression: string) => parsePeg(expression) as Token;
  * @returns A string with all environment variables either replaced, or removed if no value could be
  * substituted. */
 export const replace = (expression: string, environment: Environment) => {
-  const parsed: Token = parsePeg(expression);
+  const parsed: List = parsePeg(expression);
   return parsed.stringify(environment);
 };
