@@ -63,5 +63,5 @@ typings/
 # Source maps are only for development, no need to commit
 dist/**/*.map
 
-# The cache file for bash output.
-./test/.bash-echo-cache.json
+# Cache files for tests
+test/.*-cache.json
