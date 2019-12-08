@@ -1,5 +1,6 @@
 import { Variable } from "./Variable";
 import { VariableAssignment } from "./VariableAssignment";
+import { SubstitutedVariable } from "./SubstitutedVariable";
 import { QuotedString } from "./QuotedString";
 import { VerbatimString } from "./VerbatimString";
 import { Word } from "./Word";
@@ -11,6 +12,7 @@ type Token =
   | List
   | Variable
   | VariableAssignment
+  | SubstitutedVariable
   | Word
   | QuotedString
   | VerbatimString
@@ -19,6 +21,7 @@ type Token =
 export {
   Variable,
   VariableAssignment,
+  SubstitutedVariable,
   QuotedString,
   VerbatimString,
   Word,

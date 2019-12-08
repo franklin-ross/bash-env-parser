@@ -1,7 +1,7 @@
 // These tests are written in plain node compatible JS to ensure it works with that.
 
 const bashEcho = require("./bash-echo");
-const { parse } = require("../");
+const { parse, replace, substitute, collapseWhitespace } = require("../");
 
 const env = {
   EMPTY: "", // Should correctly handle variables set to the empty string
@@ -76,10 +76,11 @@ describe("bash fails to parse", () => {
 
 function testAgainstBash(input, env) {
   const bashOut = bashEcho.get(input, env);
-  const parsed = parse(input);
-  const output = parsed.stringify(env);
+  const output = replace(input, env);
   if (output !== bashOut) {
-    const parsedTree = parsed.toString();
+    const parsed = parse(input);
+    const substituted = substitute(parsed, env);
+    const collapsed = collapseWhitespace(substituted);
     debugger;
   }
   expect(output).toBe(bashOut);
