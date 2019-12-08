@@ -1,11 +1,8 @@
-import { TokenKind, Variable, QuotedString, VerbatimString, Word, Whitespace, SubstitutedVariable, VariableAssignment } from ".";
-/** The types of token allowed in a List. */
-export declare type ListItem = Variable | SubstitutedVariable | VariableAssignment | Word | QuotedString | VerbatimString | Whitespace;
-/** A list of tokens, including whitespace. Handles most of the rules for collapsing whitespace
- * based on context. */
+import { TokenKind, Token } from ".";
+/** A list of tokens. */
 export declare class List {
-    readonly items: ReadonlyArray<ListItem>;
+    readonly items: ReadonlyArray<Token>;
     readonly kind: TokenKind.List;
-    constructor(items: ReadonlyArray<ListItem>);
+    constructor(items: ReadonlyArray<Token>);
     toString(): string;
 }

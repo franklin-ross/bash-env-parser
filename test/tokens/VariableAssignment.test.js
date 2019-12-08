@@ -12,22 +12,19 @@ const {
 describe("tokens.VariableAssignment", () => {
   describe("parses", () => {
     const tests = [
+      ["VAR=hello", new VariableAssignment("VAR", new Word("hello"))],
       [
-        "VAR=hello",
-        new VariableAssignment("VAR", new List([new Word("hello")]))
-      ],
-      [
-        'VAR="hello"',
-        new VariableAssignment("VAR", new List([new QuotedString(["hello"])]))
+        'VAR="hello"abc',
+        new VariableAssignment(
+          "VAR",
+          new List([new QuotedString(["hello"]), new Word("abc")])
+        )
       ],
       [
         "VAR='hello'",
-        new VariableAssignment("VAR", new List([new VerbatimString("hello")]))
+        new VariableAssignment("VAR", new VerbatimString("hello"))
       ],
-      [
-        "VAR=$BOB",
-        new VariableAssignment("VAR", new List([new Variable("BOB")]))
-      ]
+      ["VAR=$BOB", new VariableAssignment("VAR", new Variable("BOB"))]
     ];
     tests.forEach(([expression, result]) =>
       it(expression, () => {
