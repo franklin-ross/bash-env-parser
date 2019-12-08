@@ -1,3 +1,5 @@
+const isWindowsCi = process.env.CI_OS === "windows-latest";
+
 const bashEcho = require("./bash-echo");
 const { parse, replace, substitute, collapseWhitespace } = require("../");
 
@@ -11,12 +13,7 @@ const env = {
 beforeAll(() => bashEcho.loadCache());
 afterAll(() => bashEcho.saveCache());
 
-describe("output matches bash", () => {
-  if (process.env.OS === "windows-latest" && process.env.CI) {
-    console.log("Skipping tests in Windows CI"); // There's no bash.
-    return;
-  }
-
+(isWindowsCi ? describe.skip : describe)("output matches bash", () => {
   const fallbackCases = ["", "fallback", "fallback with  spaces"];
   const cases = flatten([
     Object.keys(env).map(name => variablePermutations(name, fallbackCases)),
@@ -62,7 +59,7 @@ describe("output matches bash", () => {
   cases.forEach(input => it(input, () => testAgainstBash(input, env)));
 });
 
-describe("bash fails to parse", () => {
+(isWindowsCi ? describe.skip : describe)("bash fails to parse", () => {
   describe("whitespace around variable names", () =>
     // Doesn't allow whitespace around variable names
     ["${ BOB}", "${BOB\t}"].forEach(input =>

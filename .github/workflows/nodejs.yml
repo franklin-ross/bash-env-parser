@@ -24,4 +24,4 @@ jobs:
           npm run test
         env:
           CI: true
-          OS: ${{ matrix.os }}
+          CI_OS: ${{ matrix.os }}
