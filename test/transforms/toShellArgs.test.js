@@ -10,7 +10,7 @@ const {
   Whitespace: Ws
 } = require("../../");
 
-describe("transforms.toShellArgs", () => {
+describe.skip("transforms.toShellArgs", () => {
   const tests = [
     [new L([new W("a"), new Ws(" "), new W("b")]), ["a", "b"]],
     [

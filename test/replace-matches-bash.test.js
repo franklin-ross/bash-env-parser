@@ -10,10 +10,12 @@ const env = {
   OUTER_SPACES: " variable-with-outer-spaces    "
 };
 
-beforeAll(() => bash.loadCache());
-afterAll(() => bash.saveCache());
+if (!isWindowsCi) {
+  beforeAll(() => bash.loadCache());
+  afterAll(() => bash.saveCache());
+}
 
-(isWindowsCi ? describe.skip : describe)("output matches bash", () => {
+describe.skip("output matches bash", () => {
   const fallbackCases = ["", "fallback", "fallback with  spaces"];
   const cases = flatten([
     Object.keys(env).map(name => variablePermutations(name, fallbackCases)),
@@ -59,7 +61,7 @@ afterAll(() => bash.saveCache());
   cases.forEach(input => it(input, () => testAgainstBash(input, env)));
 });
 
-(isWindowsCi ? describe.skip : describe)("bash fails to parse", () => {
+describe.skip("bash fails to parse", () => {
   describe("whitespace around variable names", () =>
     // Doesn't allow whitespace around variable names
     ["${ BOB}", "${BOB\t}"].forEach(input =>
