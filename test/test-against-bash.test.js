@@ -1,5 +1,3 @@
-// These tests are written in plain node compatible JS to ensure it works with that.
-
 const bashEcho = require("./bash-echo");
 const { parse, replace, substitute, collapseWhitespace } = require("../");
 
@@ -14,6 +12,11 @@ beforeAll(() => bashEcho.loadCache());
 afterAll(() => bashEcho.saveCache());
 
 describe("output matches bash", () => {
+  if (process.env.OS === "windows-latest" && process.env.CI) {
+    console.log("Skipping tests in Windows CI"); // There's no bash.
+    return;
+  }
+
   const fallbackCases = ["", "fallback", "fallback with  spaces"];
   const cases = flatten([
     Object.keys(env).map(name => variablePermutations(name, fallbackCases)),
