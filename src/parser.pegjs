@@ -32,7 +32,7 @@ Fallback
   }
 
 VarName "variable name"
-  = [a-zA-Z_][a-zA-z_0-9]+ { return text(); }
+  = [a-zA-Z_][a-zA-Z_0-9]* { return text(); }
 
 Whitespace = [ \t\n\r]+ { return new Whitespace(text()); }
 
@@ -54,8 +54,8 @@ DoubleStringChar
   / '\\\n' { return ""; }
   / ![$"] char:. { return char; }
 SingleStringChar = !"'" char:. { return char; }
-BraceStringChar  = Escaped / !("$" / "}" / Whitespace) char:. { return char; }
-BareStringChar   = Escaped / !("$" / Whitespace) char:. { return char; }
+BraceStringChar  = Escaped / !([$}'"] / Whitespace) char:. { return char; }
+BareStringChar   = Escaped / !([$'"] / Whitespace) char:. { return char; }
 
 Escaped
   = '\\\n' { return ""; }
