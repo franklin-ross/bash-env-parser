@@ -5,7 +5,6 @@ import {
   Whitespace,
   SubstitutedVariable
 } from "../tokens";
-import { ListItem } from "../tokens/List";
 
 export function collapseWhitespace(
   token: SubstitutedVariable
@@ -18,7 +17,7 @@ export function collapseWhitespace<T extends Token>(token: T): T;
 export function collapseWhitespace(token: Token): Token | null {
   switch (token.kind) {
     case TokenKind.List:
-      const words: ListItem[] = [];
+      const words: Token[] = [];
       let lastWasWs = false;
       for (const child of token.items) {
         if (child.kind === TokenKind.Whitespace) {

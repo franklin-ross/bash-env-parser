@@ -8,6 +8,10 @@
     List,
     Whitespace
   } = require('./tokens');
+
+  function singleOrList(x) {
+    return x.length === 1 ? x[0] : new List(x);
+  }
 }
 
 start = tokens:(VariableAssignment / WordToken / Whitespace)* { return new List(tokens); }
@@ -15,7 +19,7 @@ start = tokens:(VariableAssignment / WordToken / Whitespace)* { return new List(
 WordToken = VerbatimString / QuotedString / Word / Variable
 
 VariableAssignment = name:VarName "=" value:WordToken+ {
-    return new VariableAssignment(name, new List(value));
+    return new VariableAssignment(name, singleOrList(value));
   }
 
 Variable
@@ -28,7 +32,7 @@ Variable
 
 Fallback
   = tokens:(VerbatimString / QuotedString / WordInBrace / Variable / Whitespace)* {
-    return tokens.length === 1 ? tokens[0] : new List(tokens);
+    return singleOrList(tokens);
   }
 
 VarName "variable name"
