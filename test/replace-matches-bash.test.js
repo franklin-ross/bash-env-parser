@@ -19,6 +19,8 @@ describe("output matches bash", () => {
     Object.keys(env).map(name => variablePermutations(name, fallbackCases)),
     // $WORD should be detected despite text run-on
     quotePermutations("run${WORD}on"),
+    // Word, quote, and variable run-ons should be parsed
+    quotePermutations("ll").map(ll => "he" + ll + "$WORD"),
     // Whitespace around ${NONE} should collapse unless quoted
     quotePermutations("this is ${NONE} good"),
     // Quoted whitespace should not collapse around ${NONE}
@@ -49,7 +51,9 @@ describe("output matches bash", () => {
       ...quotePermutations("$WORD"),
       ...quotePermutations("${WORD}"),
       ...quotePermutations("${WORD:-fallback}")
-    ].map(value => "NEW_VAR=" + value)
+    ].map(value => "NEW_VAR=" + value),
+    "NEW_VAR=he'll'${O}",
+    'NEW_VAR=he"ll"${O}'
   ]);
 
   cases.forEach(input => it(input, () => testAgainstBash(input, env)));
