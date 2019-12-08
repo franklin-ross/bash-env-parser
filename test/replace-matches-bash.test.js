@@ -1,6 +1,6 @@
 const isWindowsCi = process.env.CI_OS === "windows-latest";
 
-const bashEcho = require("./bash-echo");
+const bash = require("./bash-exec");
 const { parse, replace, substitute, collapseWhitespace } = require("../");
 
 const env = {
@@ -10,8 +10,8 @@ const env = {
   OUTER_SPACES: " variable-with-outer-spaces    "
 };
 
-beforeAll(() => bashEcho.loadCache());
-afterAll(() => bashEcho.saveCache());
+beforeAll(() => bash.loadCache());
+afterAll(() => bash.saveCache());
 
 (isWindowsCi ? describe.skip : describe)("output matches bash", () => {
   const fallbackCases = ["", "fallback", "fallback with  spaces"];
@@ -64,18 +64,20 @@ afterAll(() => bashEcho.saveCache());
     // Doesn't allow whitespace around variable names
     ["${ BOB}", "${BOB\t}"].forEach(input =>
       it(input, () =>
-        expect(() => bashEcho.get(input, env)).toThrowError("bad substitution")
+        expect(() => bash.get(`echo ${input}`, env)).toThrowError(
+          "bad substitution"
+        )
       )
     ));
 
   it("escaped single quotes within single quoted strings", () =>
-    expect(() => bashEcho.get("'\\''", env)).toThrowError(
+    expect(() => bash.get(`echo '\\''`, env)).toThrowError(
       "unexpected end of file"
     ));
 });
 
 function testAgainstBash(input, env) {
-  const bashOut = bashEcho.get(input, env);
+  const bashOut = bash.get(`echo ${input}`, env);
   const output = replace(input, env);
   if (output !== bashOut) {
     const parsed = parse(input);
