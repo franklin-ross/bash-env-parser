@@ -3,7 +3,8 @@ export declare const enum TokenKind {
     Whitespace = 1,
     Variable = 2,
     VariableAssignment = 3,
-    Text = 4,
-    QuotedText = 5,
-    LiteralText = 6
+    SubstitutedVariable = 4,
+    Text = 5,
+    QuotedText = 6,
+    LiteralText = 7
 }

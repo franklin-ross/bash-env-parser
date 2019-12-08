@@ -1,13 +1,11 @@
-import { Environment } from "../Environment";
-import { TokenKind, Variable, QuotedString, VerbatimString, Word, Whitespace } from ".";
+import { TokenKind, Variable, QuotedString, VerbatimString, Word, Whitespace, SubstitutedVariable } from ".";
+/** The types of token allowed in a List. */
+export declare type ListItem = Variable | SubstitutedVariable | Word | QuotedString | VerbatimString | Whitespace;
 /** A list of tokens, including whitespace. Handles most of the rules for collapsing whitespace
  * based on context. */
 export declare class List {
-    readonly items: ReadonlyArray<Variable | Word | QuotedString | VerbatimString | Whitespace>;
+    readonly items: ReadonlyArray<ListItem>;
     readonly kind: TokenKind.List;
-    constructor(items: ReadonlyArray<Variable | Word | QuotedString | VerbatimString | Whitespace>);
-    /** Converts the contained items into a string, with support for collapsing whitespace around
-     * "words". */
-    stringify(env: Environment, collapseWhitespace?: boolean): string;
+    constructor(items: ReadonlyArray<ListItem>);
     toString(): string;
 }

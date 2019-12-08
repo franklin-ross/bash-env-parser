@@ -6,6 +6,5 @@ export declare class VerbatimString {
     readonly contents: string;
     readonly kind: TokenKind.LiteralText;
     constructor(contents: string);
-    stringify(): string;
     toString(): string;
 }
