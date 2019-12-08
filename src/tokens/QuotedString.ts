@@ -1,4 +1,3 @@
-import { Environment } from "../Environment";
 import { TokenKind, Variable, SubstitutedVariable } from ".";
 
 /** Text quoted with double quotes: ". Variables substitution is performed in these strings and

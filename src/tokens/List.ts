@@ -1,4 +1,3 @@
-import { Environment } from "../Environment";
 import {
   TokenKind,
   Variable,
@@ -6,13 +5,15 @@ import {
   VerbatimString,
   Word,
   Whitespace,
-  SubstitutedVariable
+  SubstitutedVariable,
+  VariableAssignment
 } from ".";
 
 /** The types of token allowed in a List. */
 export type ListItem =
   | Variable
   | SubstitutedVariable
+  | VariableAssignment
   | Word
   | QuotedString
   | VerbatimString
