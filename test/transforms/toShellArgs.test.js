@@ -39,14 +39,14 @@ describe("transforms.toShellArgs", () => {
         new Ws(" "),
         new Var("V", ":-", new L([new W("c")])),
         new Ws(" "),
-        new W("a")
+        new W("b")
       ]),
       ["a", "b"]
     ],
     [new L([new QS(["a"]), new Ws(" "), new VS("b")]), ["a", "b"]],
     [
       new L([
-        new VarAssign("V", new L([new QS("x")])),
+        new VarAssign("V", new L([new QS(["x"])])),
         new Ws(" "),
         new W("b")
       ]),
