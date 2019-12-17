@@ -29,7 +29,7 @@ describe("transforms.substitute", () => {
           new Var("VAR")
         ]),
         new L([
-          new VarAssign("VAR", new Vs("value")),
+          new VarAssign("VAR", new W("value")),
           new Ws(" "),
           new SubVar("VAR", null)
         ])
@@ -38,7 +38,7 @@ describe("transforms.substitute", () => {
 
     tests.forEach(([ast, result]) =>
       it(ast.toString(), () => {
-        const substituted = substitute(ast, Object.create(env), false);
+        const substituted = substitute(ast, env, false);
         expect(substituted).toEqual(result);
       })
     );
@@ -53,7 +53,7 @@ describe("transforms.substitute", () => {
           new Var("VAR")
         ]),
         new L([
-          new VarAssign("VAR", new Vs("value")),
+          new VarAssign("VAR", new W("value")),
           new Ws(" "),
           new SubVar("VAR", "value")
         ])
@@ -65,7 +65,7 @@ describe("transforms.substitute", () => {
           new Var("VAR")
         ]),
         new L([
-          new VarAssign("VAR", new Vs("word")),
+          new VarAssign("VAR", new SubVar("WORD", "word")),
           new Ws(" "),
           new SubVar("VAR", "word")
         ])
