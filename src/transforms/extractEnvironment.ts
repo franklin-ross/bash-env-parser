@@ -26,20 +26,20 @@ export function extractEnvironment<T extends Token>(
 export function extractEnvironment(token: Token, env: Environment): Token {
   switch (token.kind) {
     case TokenKind.List:
-      return new List(
-        token.items
+      return token.transform(items =>
+        items
           .map(child => extractEnvironment(child, env))
           .filter(<T>(token: T): token is Exclude<T, null> => token !== null)
       );
 
     case TokenKind.VariableAssignment:
-      const substitutedValue = substitute(token.value, env);
+      const substitutedValue = substitute(token.value, env, false);
+      const assignment =
+        token.value === substitutedValue
+          ? token
+          : new VariableAssignment(token.name, substitutedValue);
       const collapsedValue = collapseWhitespace(substitutedValue);
       const stringValue = stringify(collapsedValue);
-      const assignment = new VariableAssignment(
-        token.name,
-        new List([new VerbatimString(stringValue)])
-      );
       env[token.name] = stringValue;
       return assignment;
 

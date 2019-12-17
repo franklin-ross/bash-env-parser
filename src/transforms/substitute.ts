@@ -1,12 +1,4 @@
-import {
-  List,
-  TokenKind,
-  Token,
-  QuotedString,
-  Variable,
-  VariableAssignment,
-  VerbatimString
-} from "../tokens";
+import { TokenKind, Token, Variable, VariableAssignment } from "../tokens";
 import { Environment } from "../Environment";
 import { SubstitutedVariable } from "../tokens/SubstitutedVariable";
 import { collapseWhitespace } from "./collapseWhitespace";
@@ -36,36 +28,40 @@ export function substitute(
 ) {
   switch (token.kind) {
     case TokenKind.List:
-      return new List(
-        token.items
-          .map(child => substitute(child, env))
+      return token.transform(items =>
+        items
+          .map(child => substitute(child, env, inlineAssignment))
           .filter(<T>(token: T): token is Exclude<T, null> => token !== null)
       );
 
     case TokenKind.Variable:
       let value: string | null | undefined | Token = env[token.name];
       if (!value) {
-        value = token.fallback ? substitute(token.fallback, env) : null;
+        value = token.fallback
+          ? substitute(token.fallback, env, inlineAssignment)
+          : null;
       }
       return new SubstitutedVariable(token.name, value);
 
     case TokenKind.VariableAssignment:
-      const substitutedValue = substitute(token.value, env);
-      const collapsedValue = collapseWhitespace(substitutedValue);
-      const stringValue = stringify(collapsedValue);
-      const assignment = new VariableAssignment(
-        token.name,
-        new List([new VerbatimString(stringValue)])
-      );
+      const substitutedValue = substitute(token.value, env, inlineAssignment);
+      const assignment =
+        token.value === substitutedValue
+          ? token
+          : new VariableAssignment(token.name, substitutedValue);
       if (inlineAssignment) {
+        const collapsedValue = collapseWhitespace(substitutedValue);
+        const stringValue = stringify(collapsedValue);
         env[token.name] = stringValue;
       }
       return assignment;
 
     case TokenKind.QuotedText:
-      return new QuotedString(
-        token.contents.map(item =>
-          typeof item === "string" ? item : substitute(item, env)
+      return token.transform(contents =>
+        contents.map(item =>
+          typeof item === "string"
+            ? item
+            : substitute(item, env, inlineAssignment)
         )
       );
 
