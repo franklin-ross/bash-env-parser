@@ -11,10 +11,21 @@
         "reveal": "silent",
         "clear": true
       },
-      "group": {
-        "kind": "build",
-        "isDefault": true
-      }
+      "group": { "kind": "build", "isDefault": true }
+    },
+    {
+      "type": "npm",
+      "script": "build:production",
+      "problemMatcher": ["$tsc"],
+      "presentation": { "clear": true },
+      "group": "build"
+    },
+    {
+      "type": "npm",
+      "script": "build:test",
+      "problemMatcher": ["$tsc"],
+      "presentation": { "clear": true },
+      "group": "build"
     },
     {
       "type": "npm",

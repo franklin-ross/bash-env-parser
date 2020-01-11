@@ -6,7 +6,9 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "test": "jest",
-    "build": "rollup --config",
+    "build": "rollup --config --environment BUILD:development",
+    "build:test": "rollup --config --environment BUILD:test",
+    "build:production": "rollup --config --environment BUILD:production",
     "watch": "rollup --config --watch"
   },
   "author": "Franklin Ross",
