@@ -1,55 +1,43 @@
-import {
-  TokenKind,
-  Token,
-  List,
-  Whitespace,
-  SubstitutedVariable
-} from "../tokens";
+import { Whitespace, SubstitutedVariable, transformChildren } from "../tokens";
 
 export function collapseWhitespace(
   token: SubstitutedVariable
 ): SubstitutedVariable | null;
-export function collapseWhitespace<T extends Token>(token: T): T;
+export function collapseWhitespace(token: Whitespace): Whitespace | null;
+export function collapseWhitespace<T>(token: T): T;
 
 /** Collapses adjacent whitespace down to a single space. Substituted variables which have no value
  * are removed, and whitespace around them is considered adjacent.
  * @param token The token to process. */
-export function collapseWhitespace(token: Token): Token | null {
-  switch (token.kind) {
-    case TokenKind.List:
-      return token.transform(items => {
-        const words: Token[] = [];
-        let lastWasWs = false;
-        for (const child of items) {
-          if (child.kind === TokenKind.Whitespace) {
-            lastWasWs = true;
-          } else {
-            const next = collapseWhitespace(child);
-            if (next !== null) {
-              if (lastWasWs && words.length > 0) {
-                words.push(new Whitespace(" "));
-              }
-              lastWasWs = false;
-              words.push(next);
-            }
-          }
-        }
-        return words;
-      });
-
-    case TokenKind.SubstitutedVariable:
-      let value = token.value;
-      if (value == null) {
-        return null;
-      } else if (typeof value !== "string") {
-        return collapseWhitespace(value);
+export function collapseWhitespace(token: any): any {
+  if (Array.isArray(token)) {
+    let lastWasWs = false;
+    let hasOutput = false;
+    return transformChildren(token, child => {
+      if (child instanceof Whitespace) {
+        lastWasWs = true;
+        return;
       }
-      value = value.trim().replace(/\s+/g, " ");
-      return value === token.value
-        ? token
-        : new SubstitutedVariable(token.name, value);
 
-    default:
-      return token;
+      const next = collapseWhitespace(child);
+      if (next == null) return;
+      const prefixWs = lastWasWs && hasOutput;
+      lastWasWs = false;
+      hasOutput = true;
+      return prefixWs ? [new Whitespace(" "), next] : next;
+    });
   }
+
+  if (token instanceof SubstitutedVariable) {
+    const value = token.value;
+    if (typeof value === "string") {
+      const collapsed = value.trim().replace(/\s+/g, " ");
+      return collapsed === value
+        ? token
+        : new SubstitutedVariable(token.name, collapsed);
+    }
+    return collapseWhitespace(value);
+  }
+
+  return token;
 }

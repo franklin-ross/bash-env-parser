@@ -3,7 +3,6 @@ const {
   VariableAssignment,
   Variable,
   Word,
-  List,
   QuotedString,
   VerbatimString,
   TokenKind
@@ -15,10 +14,10 @@ describe("tokens.VariableAssignment", () => {
       ["VAR=hello", new VariableAssignment("VAR", new Word("hello"))],
       [
         'VAR="hel"lo',
-        new VariableAssignment(
-          "VAR",
-          new List([new QuotedString(["hel"]), new Word("lo")])
-        )
+        new VariableAssignment("VAR", [
+          new QuotedString(["hel"]),
+          new Word("lo")
+        ])
       ],
       [
         "VAR='hello'",
@@ -36,7 +35,7 @@ describe("tokens.VariableAssignment", () => {
     tests.forEach(([expression, result]) =>
       it(expression, () => {
         const parsed = parse(expression);
-        expect(parsed).toEqual(new List([result]));
+        expect(parsed).toEqual([result]);
       })
     );
   });
@@ -46,8 +45,8 @@ describe("tokens.VariableAssignment", () => {
     tests.forEach(expression =>
       it(expression, () => {
         const parsed = parse(expression);
-        expect(parsed.items.map(x => x.kind)).not.toContain(
-          TokenKind.VariableAssignment
+        parsed.forEach(item =>
+          expect(item).not.toBeInstanceOf(VariableAssignment)
         );
       })
     );

@@ -4,12 +4,11 @@ import { SubstitutedVariable } from "./SubstitutedVariable";
 import { QuotedString } from "./QuotedString";
 import { VerbatimString } from "./VerbatimString";
 import { Word } from "./Word";
-import { List } from "./List";
 import { Whitespace } from "./Whitespace";
-export { TokenKind } from "./TokenKind";
+export * from "./infrastructure";
 
-type Token =
-  | List
+/** All tokens that come with this library. */
+export type BuiltinToken =
   | Variable
   | VariableAssignment
   | SubstitutedVariable
@@ -25,7 +24,5 @@ export {
   QuotedString,
   VerbatimString,
   Word,
-  List,
-  Token,
   Whitespace
 };

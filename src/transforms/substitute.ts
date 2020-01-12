@@ -1,4 +1,4 @@
-import { TokenKind, Token, Variable, VariableAssignment } from "../tokens";
+import { Variable, VariableAssignment, transformChildren } from "../tokens";
 import { Environment } from "../Environment";
 import { SubstitutedVariable } from "../tokens/SubstitutedVariable";
 import { collapseWhitespace } from "./collapseWhitespace";
@@ -9,7 +9,7 @@ export function substitute(
   env: Environment,
   localVariableAssignment?: boolean
 ): SubstitutedVariable;
-export function substitute<T extends Token>(
+export function substitute<T>(
   token: T,
   env: Environment,
   localVariableAssignment?: boolean
@@ -22,50 +22,33 @@ export function substitute<T extends Token>(
  * they are processed, allowing them to be referenced by later substitutions. Defaults to false. Set
  * to true to enable `cross-env` style variable assignment. */
 export function substitute(
-  token: Token,
+  token: any,
   env: Environment,
   inlineAssignment: boolean = false
 ) {
-  switch (token.kind) {
-    case TokenKind.List:
-      return token.transform(items =>
-        items
-          .map(child => substitute(child, env, inlineAssignment))
-          .filter(<T>(token: T): token is Exclude<T, null> => token !== null)
-      );
-
-    case TokenKind.Variable:
-      let value: string | null | undefined | Token = env[token.name];
-      if (!value) {
-        value = token.fallback
-          ? substitute(token.fallback, env, inlineAssignment)
-          : null;
-      }
-      return new SubstitutedVariable(token.name, value);
-
-    case TokenKind.VariableAssignment:
-      const substitutedValue = substitute(token.value, env, inlineAssignment);
-      const assignment =
-        token.value === substitutedValue
-          ? token
-          : new VariableAssignment(token.name, substitutedValue);
-      if (inlineAssignment) {
-        const collapsedValue = collapseWhitespace(substitutedValue);
-        const stringValue = stringify(collapsedValue);
-        env[token.name] = stringValue;
-      }
-      return assignment;
-
-    case TokenKind.QuotedText:
-      return token.transform(contents =>
-        contents.map(item =>
-          typeof item === "string"
-            ? item
-            : substitute(item, env, inlineAssignment)
-        )
-      );
-
-    default:
-      return token;
+  if (token instanceof Variable) {
+    let value = env[token.name];
+    if (!value) {
+      value = token.fallback
+        ? substitute(token.fallback, env, inlineAssignment)
+        : null;
+    }
+    return new SubstitutedVariable(token.name, value);
   }
+
+  if (token instanceof VariableAssignment) {
+    const substitutedValue = substitute(token.value, env, inlineAssignment);
+    const assignment =
+      token.value === substitutedValue
+        ? token
+        : new VariableAssignment(token.name, substitutedValue);
+    if (inlineAssignment) {
+      const collapsedValue = collapseWhitespace(substitutedValue);
+      const stringValue = stringify(collapsedValue);
+      env[token.name] = stringValue;
+    }
+    return assignment;
+  }
+
+  return transformChildren(token, t => substitute(t, env, inlineAssignment));
 }

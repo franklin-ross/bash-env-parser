@@ -4,8 +4,8 @@ import { SubstitutedVariable } from "./SubstitutedVariable";
 import { QuotedString } from "./QuotedString";
 import { VerbatimString } from "./VerbatimString";
 import { Word } from "./Word";
-import { List } from "./List";
 import { Whitespace } from "./Whitespace";
-export { TokenKind } from "./TokenKind";
-declare type Token = List | Variable | VariableAssignment | SubstitutedVariable | Word | QuotedString | VerbatimString | Whitespace;
-export { Variable, VariableAssignment, SubstitutedVariable, QuotedString, VerbatimString, Word, List, Token, Whitespace };
+export * from "./infrastructure";
+/** All tokens that come with this library. */
+export declare type BuiltinToken = Variable | VariableAssignment | SubstitutedVariable | Word | QuotedString | VerbatimString | Whitespace;
+export { Variable, VariableAssignment, SubstitutedVariable, QuotedString, VerbatimString, Word, Whitespace };

@@ -12,44 +12,40 @@ const {
 
 describe("transforms.toShellArgs", () => {
   const tests = [
-    [new L([new W("a"), new Ws(" "), new W("b")]), ["a", "b"]],
     [
-      new L([
-        new W("a"),
-        new Ws(" "),
-        new SubVar("V", null),
-        new Ws(" "),
-        new W("b")
-      ]),
+      [new W("a"), new Ws(" "), new W("b")],
       ["a", "b"]
     ],
     [
-      new L([
+      [new W("a"), new Ws(" "), new SubVar("V", null), new Ws(" "), new W("b")],
+      ["a", "b"]
+    ],
+    [
+      [
         new W("a"),
         new Ws(" "),
-        new SubVar("V", new L([new SubVar("X", new W("c"))])),
+        new SubVar("V", [new SubVar("X", new W("c"))]),
         new Ws(" "),
         new W("b")
-      ]),
+      ],
       ["a", "c", "b"]
     ],
     [
-      new L([
+      [
         new W("a"),
         new Ws(" "),
-        new Var("V", ":-", new L([new W("c")])),
+        new Var("V", ":-", [new W("c")]),
         new Ws(" "),
         new W("b")
-      ]),
+      ],
       ["a", "b"]
     ],
-    [new L([new QS(["a"]), new Ws(" "), new VS("b")]), ["a", "b"]],
     [
-      new L([
-        new VarAssign("V", new L([new QS(["x"])])),
-        new Ws(" "),
-        new W("b")
-      ]),
+      [new QS(["a"]), new Ws(" "), new VS("b")],
+      ["a", "b"]
+    ],
+    [
+      [new VarAssign("V", [new QS(["x"])]), new Ws(" "), new W("b")],
       ["V=x", "b"] // I don't know whether variable assignments should show up.
     ]
   ];

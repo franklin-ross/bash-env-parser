@@ -1,10 +1,10 @@
-import { Token, TokenKind } from ".";
+import { TransformChildren } from "./infrastructure";
 /** A variable reference like $VAR, ${VAR}, or ${VAR:-fallback}. */
 export declare class Variable {
     readonly name: string;
     readonly fallbackType: null | ":-" | ":=";
-    readonly fallback: null | Token;
-    readonly kind: TokenKind.Variable;
-    constructor(name: string, fallbackType?: null | ":-" | ":=", fallback?: null | Token);
+    readonly fallback: any;
+    constructor(name: string, fallbackType?: null | ":-" | ":=", fallback?: any);
     toString(): string;
+    [TransformChildren](transformer: (token: any) => any): Variable;
 }
