@@ -5,16 +5,15 @@
     Variable,
     VariableAssignment,
     Word,
-    List,
     Whitespace
   } = require('./tokens');
 
-  function singleOrList(x) {
-    return x.length === 1 ? x[0] : new List(x);
+  function singleOrList(list) {
+    return list.length === 1 ? list[0] : list;
   }
 }
 
-start = tokens:(VariableAssignment / WordToken / Whitespace)* { return new List(tokens); }
+start = (VariableAssignment / WordToken / Whitespace)*
 
 WordToken = VerbatimString / QuotedString / Word / Variable
 

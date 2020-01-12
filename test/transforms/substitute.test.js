@@ -4,9 +4,7 @@ const {
   Variable: Var,
   VariableAssignment: VarAssign,
   Whitespace: Ws,
-  Word: W,
-  VerbatimString: Vs,
-  List: L
+  Word: W
 } = require("../../");
 
 describe("transforms.substitute", () => {
@@ -18,21 +16,17 @@ describe("transforms.substitute", () => {
     const tests = [
       [new Var("WORD"), new SubVar("WORD", "word")],
       [
-        new L([new W("a"), new Var("WORD")]),
-        new L([new W("a"), new SubVar("WORD", "word")])
+        [new W("a"), new Var("WORD")],
+        [new W("a"), new SubVar("WORD", "word")]
       ],
       [new Var("NONE"), new SubVar("NONE", null)],
       [
-        new L([
-          new VarAssign("VAR", new W("value")),
-          new Ws(" "),
-          new Var("VAR")
-        ]),
-        new L([
+        [new VarAssign("VAR", new W("value")), new Ws(" "), new Var("VAR")],
+        [
           new VarAssign("VAR", new W("value")),
           new Ws(" "),
           new SubVar("VAR", null)
-        ])
+        ]
       ]
     ];
 
@@ -47,28 +41,20 @@ describe("transforms.substitute", () => {
   describe("with local assignment", () => {
     const tests = [
       [
-        new L([
-          new VarAssign("VAR", new W("value")),
-          new Ws(" "),
-          new Var("VAR")
-        ]),
-        new L([
+        [new VarAssign("VAR", new W("value")), new Ws(" "), new Var("VAR")],
+        [
           new VarAssign("VAR", new W("value")),
           new Ws(" "),
           new SubVar("VAR", "value")
-        ])
+        ]
       ],
       [
-        new L([
-          new VarAssign("VAR", new Var("WORD")),
-          new Ws(" "),
-          new Var("VAR")
-        ]),
-        new L([
+        [new VarAssign("VAR", new Var("WORD")), new Ws(" "), new Var("VAR")],
+        [
           new VarAssign("VAR", new SubVar("WORD", "word")),
           new Ws(" "),
           new SubVar("VAR", "word")
-        ])
+        ]
       ]
     ];
 

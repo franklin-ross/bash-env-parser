@@ -1,4 +1,4 @@
-import { TokenKind, Token } from "../tokens";
+import { VariableAssignment, transformChildren } from "../tokens";
 import { Environment } from "../Environment";
 import { stringify } from "./stringify";
 import { collapseWhitespace } from "./collapseWhitespace";
@@ -9,24 +9,22 @@ import { substitute } from "./substitute";
  * first substitute all tokens up front, then assign variables. If that ordering is preferred then
  * call @see substitute() on the tree first. */
 export function extractEnvironment(
-  token: Token,
+  token: any,
   env: Environment = {}
 ): Environment {
-  switch (token.kind) {
-    case TokenKind.List:
-      for (const child of token.items) {
-        extractEnvironment(child, env);
-      }
-      return env;
-
-    case TokenKind.VariableAssignment:
-      const substitutedValue = substitute(token.value, env, false);
+  const extract = (t: any) => {
+    if (t instanceof VariableAssignment) {
+      const varAssign = t as VariableAssignment;
+      const substitutedValue = substitute(varAssign.value, env, false);
       const collapsedValue = collapseWhitespace(substitutedValue);
       const stringValue = stringify(collapsedValue);
-      env[token.name] = stringValue;
-      return env;
+      env[varAssign.name] = stringValue;
+    } else {
+      transformChildren(token, extract);
+    }
+    return t;
+  };
 
-    default:
-      return env;
-  }
+  extract(token);
+  return env;
 }
