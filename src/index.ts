@@ -15,7 +15,7 @@ type ParseToken = Exclude<BuiltinToken, SubstitutedVariable>;
  * "And '  quoted' spaces".
  * @returns The parse tree representing the input. */
 export const parse = (expression: string) =>
-  parsePeg(expression) as ParseToken[];
+  parsePeg(expression) as ReadonlyArray<ParseToken>;
 
 /** Replaces environment variables in the input.
  * @param expression The input text. Eg: "${NODE_ENV:-${ENV:-prod}}", "My name is $NAME",
@@ -25,7 +25,7 @@ export const parse = (expression: string) =>
  * @returns A string with all environment variables either replaced, or removed if no value could be
  * substituted. Adjacent whitespace is collapsed down to a single space unless quoted. */
 export const replace = (expression: string, environment: Environment) => {
-  const parsed: ParseToken[] = parsePeg(expression);
+  const parsed: ReadonlyArray<ParseToken> = parsePeg(expression);
   const substituted = substitute(parsed, environment);
   const collapsed = collapseWhitespace(substituted);
   return stringify(collapsed);
@@ -36,7 +36,7 @@ export const replace = (expression: string, environment: Environment) => {
 //   environment: Environment,
 //   isWindows: boolean
 // ) => {
-//   const parsed: ParseToken[] = parsePeg(expression);
+//   const parsed: ReadonlyArray<ParseToken> = parsePeg(expression);
 //   const substituted = substitute(parsed, environment);
 //   const collapsed = replaceVarsForCrossEnv(substituted, isWindows);
 //   return stringify(collapsed);

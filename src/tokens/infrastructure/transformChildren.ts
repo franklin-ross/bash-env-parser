@@ -6,9 +6,9 @@ interface IHaveChildren {
 
 /** Transform an array, returning a new array if any children change. */
 export function transformChildren<T>(
-  value: T[],
+  value: ReadonlyArray<T>,
   transformer: (item: any) => any
-): T[];
+): ReadonlyArray<T>;
 
 /** If the value provides support for transforming it's children, then transform them. */
 export function transformChildren<T extends IHaveChildren>(
@@ -40,7 +40,10 @@ export function transformChildren(
   return value;
 }
 
-function transformArray(value: any[], transformer: (item: any) => any) {
+function transformArray(
+  value: ReadonlyArray<any>,
+  transformer: (item: any) => any
+): ReadonlyArray<any> {
   // Scan through the children until the transform function changes one of them.
   for (let i = 0, len = value.length; i < len; ++i) {
     let item = value[i];

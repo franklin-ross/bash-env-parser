@@ -10,7 +10,7 @@ import {
 
 /** Convert the token list into an array of strings suitable for passing to a shell process as args.
  */
-export function toShellArgs(token: any[]): string[];
+export function toShellArgs(token: ReadonlyArray<any>): string[];
 /** Unsubstituted variables are stripped from shell args. */
 export function toShellArgs(token: Variable): null;
 /** Convert the token list into an array of strings suitable for passing to a shell process as args.
@@ -70,7 +70,7 @@ export function toShellArgs(token: any) {
   }
 }
 
-function join(x: null | string | string[]): string {
+function join(x: null | string | readonly string[]): string {
   if (x == null) return "";
   if (typeof x === "string") return x;
   return x.join("");
