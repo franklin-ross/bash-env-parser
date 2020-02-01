@@ -1,10 +1,8 @@
 const {
   toShellArgs,
-  SubstitutedVariable: SubVar,
   Variable: Var,
   VariableAssignment: VarAssign,
   Word: W,
-  List: L,
   QuotedString: QS,
   VerbatimString: VS,
   Whitespace: Ws
@@ -17,17 +15,11 @@ describe("transforms.toShellArgs", () => {
       ["a", "b"]
     ],
     [
-      [new W("a"), new Ws(" "), new SubVar("V", null), new Ws(" "), new W("b")],
+      [new W("a"), new Ws(" "), new Ws(" "), new W("b")],
       ["a", "b"]
     ],
     [
-      [
-        new W("a"),
-        new Ws(" "),
-        new SubVar("V", [new SubVar("X", new W("c"))]),
-        new Ws(" "),
-        new W("b")
-      ],
+      [new W("a"), new Ws(" "), new W("c"), new Ws(" "), new W("b")],
       ["a", "c", "b"]
     ],
     [

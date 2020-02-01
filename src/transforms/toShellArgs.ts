@@ -1,6 +1,5 @@
 import {
   Variable,
-  SubstitutedVariable,
   QuotedString,
   Word,
   Whitespace,
@@ -43,11 +42,6 @@ export function toShellArgs(token: any) {
   if (token instanceof Variable) {
     // Treat variables which haven't been substituted as though they have no value.
     return null;
-  }
-
-  if (token instanceof SubstitutedVariable) {
-    const value = token.value;
-    return value == null ? null : join(toShellArgs(value));
   }
 
   if (token instanceof VariableAssignment) {

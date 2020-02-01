@@ -25,7 +25,8 @@ const options = {
       // pegjs output needs to be entirely in cjs format so the commonjs plugin can convert it to
       // es6 modules. If it contains any es6 module syntax, it won't be converted.
       format: "commonjs",
-      target: "cjs"
+      target: "cjs",
+      allowedStartRules: ["start", "VariableValue"]
     }),
     commonjs({
       extensions: [".js", ".ts", ".pegjs"]

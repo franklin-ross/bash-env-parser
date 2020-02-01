@@ -1,13 +1,11 @@
 import { Environment } from "./Environment";
 import { parse as parsePeg } from "./parser.pegjs";
 import { substitute, collapseWhitespace, stringify } from "./transforms";
-import { SubstitutedVariable, BuiltinToken } from "./tokens";
+import { BuiltinToken } from "./tokens";
 
 export * from "./tokens";
 export * from "./transforms";
 export { Environment } from "./Environment";
-
-type ParseToken = Exclude<BuiltinToken, SubstitutedVariable>;
 
 /** Parses the input expression for bash style variables, returning a parse tree. Supports bash
  * style quotes (double and single), and default values.
@@ -15,7 +13,7 @@ type ParseToken = Exclude<BuiltinToken, SubstitutedVariable>;
  * "And '  quoted' spaces".
  * @returns The parse tree representing the input. */
 export const parse = (expression: string) =>
-  parsePeg(expression) as ReadonlyArray<ParseToken>;
+  parsePeg(expression) as ReadonlyArray<BuiltinToken>;
 
 /** Replaces environment variables in the input.
  * @param expression The input text. Eg: "${NODE_ENV:-${ENV:-prod}}", "My name is $NAME",
@@ -25,19 +23,33 @@ export const parse = (expression: string) =>
  * @returns A string with all environment variables either replaced, or removed if no value could be
  * substituted. Adjacent whitespace is collapsed down to a single space unless quoted. */
 export const replace = (expression: string, environment: Environment) => {
-  const parsed: ReadonlyArray<ParseToken> = parsePeg(expression);
+  const parsed: ReadonlyArray<BuiltinToken> = parsePeg(expression);
   const substituted = substitute(parsed, environment);
   const collapsed = collapseWhitespace(substituted);
   return stringify(collapsed);
 };
 
-// export const crossEnv = (
+// export function crossEnv(
 //   expression: string,
 //   environment: Environment,
 //   isWindows: boolean
-// ) => {
-//   const parsed: ReadonlyArray<ParseToken> = parsePeg(expression);
+// ): string;
+
+// export function crossEnv(
+//   expression: string,
+//   environment: Environment,
+//   shell: "sh" | "bash" | "cmd"
+// ): string;
+
+// export function crossEnv(
+//   expression: string,
+//   environment: Environment,
+//   localiser: "sh" | "bash" | "cmd" | boolean
+// ) {
+//   const loc =
+//     typeof localiser === "boolean" ? (localiser ? "cmd" : "sh") : localiser;
+//   const parsed: ReadonlyArray<BuiltinToken> = parsePeg(expression);
 //   const substituted = substitute(parsed, environment);
-//   const collapsed = replaceVarsForCrossEnv(substituted, isWindows);
+//   const collapsed = localiseVariables(substituted, loc);
 //   return stringify(collapsed);
-// };
+// }

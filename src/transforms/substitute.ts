@@ -1,19 +1,19 @@
-import { Variable, VariableAssignment, transformChildren } from "../tokens";
+import {
+  Variable,
+  VariableAssignment,
+  transformChildren,
+  Whitespace,
+  Word
+} from "../tokens";
 import { Environment } from "../Environment";
-import { SubstitutedVariable } from "../tokens/SubstitutedVariable";
 import { collapseWhitespace } from "./collapseWhitespace";
 import { stringify } from "./stringify";
+import { parse as parsePeg } from "../parser.pegjs";
 
-export function substitute(
-  token: Variable,
-  env: Environment,
-  localVariableAssignment?: boolean
-): SubstitutedVariable;
-export function substitute<T>(
-  token: T,
-  env: Environment,
-  localVariableAssignment?: boolean
-): T;
+const parseOptions = { startRule: "VariableValue" };
+const parseEnvValue = (value: string) => {
+  return parsePeg(value, parseOptions) as Array<Whitespace | Word>;
+};
 
 /** Returns a new syntax tree with all variable references substituted/expanded.
  * @param token The root token to transform.
@@ -21,29 +21,28 @@ export function substitute<T>(
  * @param inlineAssignment Whether to set variable assignment tokens into the environment object as
  * they are processed, allowing them to be referenced by later substitutions. Defaults to false. Set
  * to true to enable `cross-env` style variable assignment. */
-export function substitute(
+export function substitute<T>(
   token: any,
   env: Environment,
   inlineAssignment: boolean = false
-) {
+): T {
   function sub(token: any): any {
     if (token instanceof Variable) {
-      let value = env[token.name];
+      const value = env[token.name];
       if (value == null || value === "") {
-        value = token.fallback ? sub(token.fallback) : null;
+        return token.fallback ? sub(token.fallback) : null;
       }
-      return token.substitute(value);
+      return parseEnvValue(value);
     }
 
     if (token instanceof VariableAssignment) {
       const substitutedValue = sub(token.value);
-      const assignment = token.withValue(substitutedValue);
       if (inlineAssignment) {
         const collapsedValue = collapseWhitespace(substitutedValue);
         const stringValue = stringify(collapsedValue);
         env[token.name] = stringValue;
       }
-      return assignment;
+      return token.withValue(substitutedValue);
     }
 
     return transformChildren(token, sub);

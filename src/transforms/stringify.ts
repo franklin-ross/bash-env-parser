@@ -1,5 +1,4 @@
 import {
-  SubstitutedVariable,
   QuotedString,
   Whitespace,
   VerbatimString,
@@ -20,10 +19,6 @@ function str(token: any): string | null | undefined {
 
   if (Array.isArray(token)) {
     return transformChildren(token, str).join("");
-  }
-
-  if (token instanceof SubstitutedVariable) {
-    return str(token.value);
   }
 
   if (token instanceof VariableAssignment) {
