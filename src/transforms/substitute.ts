@@ -26,29 +26,27 @@ export function substitute(
   env: Environment,
   inlineAssignment: boolean = false
 ) {
-  if (token instanceof Variable) {
-    let value = env[token.name];
-    if (!value) {
-      value = token.fallback
-        ? substitute(token.fallback, env, inlineAssignment)
-        : null;
+  function sub(token: any): any {
+    if (token instanceof Variable) {
+      let value = env[token.name];
+      if (value == null || value === "") {
+        value = token.fallback ? sub(token.fallback) : null;
+      }
+      return token.substitute(value);
     }
-    return new SubstitutedVariable(token.name, value);
-  }
 
-  if (token instanceof VariableAssignment) {
-    const substitutedValue = substitute(token.value, env, inlineAssignment);
-    const assignment =
-      token.value === substitutedValue
-        ? token
-        : new VariableAssignment(token.name, substitutedValue);
-    if (inlineAssignment) {
-      const collapsedValue = collapseWhitespace(substitutedValue);
-      const stringValue = stringify(collapsedValue);
-      env[token.name] = stringValue;
+    if (token instanceof VariableAssignment) {
+      const substitutedValue = sub(token.value);
+      const assignment = token.withValue(substitutedValue);
+      if (inlineAssignment) {
+        const collapsedValue = collapseWhitespace(substitutedValue);
+        const stringValue = stringify(collapsedValue);
+        env[token.name] = stringValue;
+      }
+      return assignment;
     }
-    return assignment;
-  }
 
-  return transformChildren(token, t => substitute(t, env, inlineAssignment));
+    return transformChildren(token, sub);
+  }
+  return sub(token);
 }

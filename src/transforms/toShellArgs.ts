@@ -7,6 +7,7 @@ import {
   VerbatimString,
   VariableAssignment
 } from "../tokens";
+import { stringify } from "./stringify";
 
 /** Convert the token list into an array of strings suitable for passing to a shell process as args.
  */
@@ -46,7 +47,7 @@ export function toShellArgs(token: any) {
 
   if (token instanceof SubstitutedVariable) {
     const value = token.value;
-    return value == null ? null : join(toShellArgs(token.value));
+    return value == null ? null : join(toShellArgs(value));
   }
 
   if (token instanceof VariableAssignment) {
@@ -55,10 +56,7 @@ export function toShellArgs(token: any) {
   }
 
   if (token instanceof QuotedString) {
-    return token.contents.reduce<string>((text, next) => {
-      if (typeof next === "string") return text + next;
-      return text + (join(toShellArgs(next)) ?? "");
-    }, "");
+    return stringify(token);
   }
 
   if (
@@ -68,6 +66,8 @@ export function toShellArgs(token: any) {
   ) {
     return token.contents;
   }
+
+  return "";
 }
 
 function join(x: null | string | readonly string[]): string {

@@ -31,10 +31,7 @@ export function collapseWhitespace(token: any): any {
   if (token instanceof SubstitutedVariable) {
     const value = token.value;
     if (typeof value === "string") {
-      const collapsed = value.trim().replace(/\s+/g, " ");
-      return collapsed === value
-        ? token
-        : new SubstitutedVariable(token.name, collapsed);
+      return token.withValue(value.trim().replace(/\s+/g, " "));
     }
     return collapseWhitespace(value);
   }
