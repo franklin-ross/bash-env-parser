@@ -11,9 +11,8 @@ import { stringify } from "./stringify";
 import { parse as parsePeg } from "../parser.pegjs";
 
 const parseOptions = { startRule: "VariableValue" };
-const parseEnvValue = (value: string) => {
-  return parsePeg(value, parseOptions) as Array<Whitespace | Word>;
-};
+const parseEnvValue = (value: string) =>
+  parsePeg(value, parseOptions) as Array<Whitespace | Word>;
 
 /** Returns a new syntax tree with all variable references substituted/expanded.
  * @param token The root token to transform.
