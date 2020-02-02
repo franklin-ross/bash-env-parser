@@ -8,6 +8,7 @@ export class Variable {
     public readonly fallback: any = null
   ) {}
 
+  /** Stringifies the variable into it's bash version, including fallback. */
   toString() {
     return (
       "${" + this.name + (this.fallbackType ?? "") + (this.fallback ?? "") + "}"
