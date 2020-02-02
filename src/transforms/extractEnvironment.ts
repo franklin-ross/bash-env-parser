@@ -17,7 +17,9 @@ export function extractEnvironment(
       const substitutedValue = substitute(t.value, env, false);
       const collapsedValue = collapseWhitespace(substitutedValue);
       const stringValue = stringify(collapsedValue);
-      env[t.name] = stringValue;
+      if (stringValue !== "") {
+        env[t.name] = stringValue;
+      }
     } else {
       transformChildren(t, extract);
     }
