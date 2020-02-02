@@ -4,7 +4,8 @@ import {
   transformChildren,
   Whitespace,
   Word,
-  BuiltinToken
+  BuiltinToken,
+  VerbatimString
 } from "../tokens";
 import { Environment } from "../Environment";
 import { collapseWhitespace } from "./collapseWhitespace";
