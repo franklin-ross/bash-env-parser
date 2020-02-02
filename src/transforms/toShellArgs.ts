@@ -12,7 +12,7 @@ import { stringify } from "./stringify";
  */
 export function toShellArgs(token: ReadonlyArray<any>): string[];
 /** Unsubstituted variables are stripped from shell args. */
-export function toShellArgs(token: Variable): null;
+export function toShellArgs(token: Variable | VariableAssignment): null;
 /** Convert the token list into an array of strings suitable for passing to a shell process as args.
  */
 export function toShellArgs(token: any): string;
@@ -39,14 +39,8 @@ export function toShellArgs(token: any) {
     return args;
   }
 
-  if (token instanceof Variable) {
-    // Treat variables which haven't been substituted as though they have no value.
+  if (token instanceof Variable || token instanceof VariableAssignment) {
     return null;
-  }
-
-  if (token instanceof VariableAssignment) {
-    // Should variable assignments show up or be stripped?
-    return `${token.name}=${join(toShellArgs(token.value))}`;
   }
 
   if (token instanceof QuotedString) {
@@ -60,12 +54,4 @@ export function toShellArgs(token: any) {
   ) {
     return token.contents;
   }
-
-  return "";
-}
-
-function join(x: null | string | readonly string[]): string {
-  if (x == null) return "";
-  if (typeof x === "string") return x;
-  return x.join("");
 }

@@ -36,10 +36,7 @@ describe("transforms.toShellArgs", () => {
       [new QS(["a"]), new Ws(" "), new VS("b")],
       ["a", "b"]
     ],
-    [
-      [new VarAssign("V", [new QS(["x"])]), new Ws(" "), new W("b")],
-      ["V=x", "b"] // I don't know whether variable assignments should show up.
-    ]
+    [[new VarAssign("V", [new QS(["x"])]), new Ws(" "), new W("b")], ["b"]]
   ];
 
   tests.forEach(([ast, result]) =>
