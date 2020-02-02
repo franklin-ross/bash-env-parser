@@ -20,8 +20,8 @@ describe("transforms.substitute", () => {
       ],
       [new Var("NONE"), null],
       [
-        [new VarAssign("VAR", new W("value")), new Ws(" "), new Var("VAR")],
-        [new VarAssign("VAR", new W("value")), new Ws(" ")]
+        [new VarAssign("VAR", new Var("WORD")), new Ws(" "), new Var("VAR")],
+        [new VarAssign("VAR", new W("word")), new Ws(" ")]
       ]
     ];
 
@@ -37,11 +37,11 @@ describe("transforms.substitute", () => {
     const tests = [
       [
         [new VarAssign("VAR", new W("value")), new Ws(" "), new Var("VAR")],
-        [new VarAssign("VAR", new W("value")), new Ws(" "), new W("value")]
+        [new Ws(" "), new W("value")]
       ],
       [
         [new VarAssign("VAR", new Var("WORD")), new Ws(" "), new Var("VAR")],
-        [new VarAssign("VAR", new W("word")), new Ws(" "), new W("word")]
+        [new Ws(" "), new W("word")]
       ]
     ];
 
