@@ -1,2 +1,1592 @@
-"use strict";Object.defineProperty(exports,"__esModule",{value:!0});const TransformChildren=Symbol("transform children");function transformChildren(t,r){if(null!=t){if(Array.isArray(t))return transformArray(t,r);if("object"==typeof t&&"function"==typeof t[TransformChildren])return t[TransformChildren](r)}return t}function transformArray(t,r){for(let n=0,e=t.length;n<e;++n){let i=t[n],a=r(i);if(i===a)continue;const s=t.slice(0,n),o=push;for(o(s,a),++n;n<e;++n)i=t[n],a=r(i),o(s,a);return s}return t}function push(t,r){null!=r&&(Array.isArray(r)?t.push(...r):t.push(r))}class Variable{constructor(t,r=null,n=null){this.name=t,this.fallbackType=r,this.fallback=n}toString(){var t,r;return"${"+this.name+(null!=(t=this.fallbackType)?t:"")+(null!=(r=this.fallback)?r:"")+"}"}[TransformChildren](t){const r=this.fallback,n=transformChildren(r,t);return n!==r?new Variable(this.name,this.fallbackType,n):this}}class VariableAssignment{constructor(t,r){this.name=t,this.value=r}toString(){return this.name+"="+this.value}[TransformChildren](t){const r=this.value,n=transformChildren(r,t);return n!==r?new VariableAssignment(this.name,n):this}}class SubstitutedVariable{constructor(t,r){this.name=t,this.value=r}toString(){let t=this.value;return t&&(t="string"==typeof t?t:t.toString()),"${"+this.name+"="+t+"}"}[TransformChildren](t){const r=this.value,n=transformChildren(r,t);return n!==r?new SubstitutedVariable(this.name,n):this}}class QuotedString{constructor(t){this.contents=t}toString(){return`"${this.contents}"`}[TransformChildren](t){const r=this.contents,n=transformChildren(r,t);return n!==r?new QuotedString(n):this}}class VerbatimString{constructor(t){this.contents=t}toString(){return`'${this.contents}'`}}class Word{constructor(t){this.contents=t}toString(){return`(${this.contents})`}}class Whitespace{constructor(t){this.contents=t}toString(){return`(${this.contents})`}}var tokens=Object.freeze({__proto__:null,Variable:Variable,VariableAssignment:VariableAssignment,SubstitutedVariable:SubstitutedVariable,QuotedString:QuotedString,VerbatimString:VerbatimString,Word:Word,Whitespace:Whitespace,TransformChildren:TransformChildren,transformChildren:transformChildren}),parser="use strict";function peg$subclass(t,r){function n(){this.constructor=t}n.prototype=r.prototype,t.prototype=new n}function peg$SyntaxError(t,r,n,e){this.message=t,this.expected=r,this.found=n,this.location=e,this.name="SyntaxError","function"==typeof Error.captureStackTrace&&Error.captureStackTrace(this,peg$SyntaxError)}function peg$parse(t,r){r=void 0!==r?r:{};var n,e={},i={start:gt},a=gt,s="=",o=ct("=",!1),u=function(t,r){return new kt(t,zt(r))},c="${",l=ct("${",!1),f=":-",h=ct(":-",!1),p=":=",g=ct(":=",!1),d="}",b=ct("}",!1),m=function(t,r,n){return new jt(t,r,n)},A=function(t){return new jt(t)},v="$",y=ct("$",!1),S=function(){return new _t("$")},x=function(t){return zt(t)},C={type:"other",description:"variable name"},V=/^[a-zA-Z_]/,$=lt([["a","z"],["A","Z"],"_"],!1,!1),W=/^[a-zA-Z_0-9]/,w=lt([["a","z"],["A","Z"],"_",["0","9"]],!1,!1),E=function(){return ut()},T=/^[ \t\n\r]/,_=lt([" ","\t","\n","\r"],!1,!1),j=function(){return new Ft(ut())},k="'",Q=ct("'",!1),F=function(t){return new _t(t)},z='"',R=ct('"',!1),Z=function(t){return new Tt(t)},M=function(t){return new Qt(t.join(""))},O=function(t){return t.join("")},P="\\",U=ct("\\",!1),q=/^[$"`\\]/,B=lt(["$",'"',"`","\\"],!1,!1),D=function(t){return t},G="\\\n",H=ct("\\\n",!1),I=function(){return""},J=/^[$"]/,K=lt(["$",'"'],!1,!1),L={type:"any"},N=function(t){return t},X=/^[$}'"]/,Y=lt(["$","}","'",'"'],!1,!1),tt=/^[$'"]/,rt=lt(["$","'",'"'],!1,!1),nt=0,et=0,it=[{line:1,column:1}],at=0,st=[],ot=0;if("startRule"in r){if(!(r.startRule in i))throw new Error("Can't start parsing from rule \""+r.startRule+'".');a=i[r.startRule]}function ut(){return t.substring(et,nt)}function ct(t,r){return{type:"literal",text:t,ignoreCase:r}}function lt(t,r,n){return{type:"class",parts:t,inverted:r,ignoreCase:n}}function ft(r){var n,e=it[r];if(e)return e;for(n=r-1;!it[n];)n--;for(e={line:(e=it[n]).line,column:e.column};n<r;)10===t.charCodeAt(n)?(e.line++,e.column=1):e.column++,n++;return it[r]=e,e}function ht(t,r){var n=ft(t),e=ft(r);return{start:{offset:t,line:n.line,column:n.column},end:{offset:r,line:e.line,column:e.column}}}function pt(t){nt<at||(nt>at&&(at=nt,st=[]),st.push(t))}function gt(){var t,r;for(t=[],(r=bt())===e&&(r=dt())===e&&(r=vt());r!==e;)t.push(r),(r=bt())===e&&(r=dt())===e&&(r=vt());return t}function dt(){var t;return(t=yt())===e&&(t=St())===e&&(t=function(){var t,r,n;if(t=nt,r=[],(n=wt())!==e)for(;n!==e;)r.push(n),n=wt();else r=e;r!==e&&(et=t,r=M(r));return t=r}())===e&&(t=mt()),t}function bt(){var r,n,i,a,c;if(r=nt,(n=At())!==e)if(61===t.charCodeAt(nt)?(i=s,nt++):(i=e,0===ot&&pt(o)),i!==e){if(a=[],(c=dt())!==e)for(;c!==e;)a.push(c),c=dt();else a=e;a!==e?(et=r,r=n=u(n,a)):(nt=r,r=e)}else nt=r,r=e;else nt=r,r=e;return r}function mt(){var r,n,i,a,s,o;return r=nt,t.substr(nt,2)===c?(n=c,nt+=2):(n=e,0===ot&&pt(l)),n!==e&&(i=At())!==e?(t.substr(nt,2)===f?(a=f,nt+=2):(a=e,0===ot&&pt(h)),a===e&&(t.substr(nt,2)===p?(a=p,nt+=2):(a=e,0===ot&&pt(g))),a!==e&&(s=function(){var t,r,n;t=nt,r=[],(n=yt())===e&&(n=St())===e&&(n=xt())===e&&(n=mt())===e&&(n=vt());for(;n!==e;)r.push(n),(n=yt())===e&&(n=St())===e&&(n=xt())===e&&(n=mt())===e&&(n=vt());r!==e&&(et=t,r=x(r));return t=r}())!==e?(125===t.charCodeAt(nt)?(o=d,nt++):(o=e,0===ot&&pt(b)),o!==e?(et=r,r=n=m(i,a,s)):(nt=r,r=e)):(nt=r,r=e)):(nt=r,r=e),r===e&&(r=nt,t.substr(nt,2)===c?(n=c,nt+=2):(n=e,0===ot&&pt(l)),n!==e&&(i=At())!==e?(125===t.charCodeAt(nt)?(a=d,nt++):(a=e,0===ot&&pt(b)),a!==e?(et=r,r=n=A(i)):(nt=r,r=e)):(nt=r,r=e),r===e&&(r=nt,36===t.charCodeAt(nt)?(n=v,nt++):(n=e,0===ot&&pt(y)),n!==e&&(i=At())!==e?(et=r,r=n=A(i)):(nt=r,r=e),r===e&&(r=nt,36===t.charCodeAt(nt)?(n=v,nt++):(n=e,0===ot&&pt(y)),n!==e&&(et=r,n=S()),r=n))),r}function At(){var r,n,i,a;if(ot++,r=nt,V.test(t.charAt(nt))?(n=t.charAt(nt),nt++):(n=e,0===ot&&pt($)),n!==e){for(i=[],W.test(t.charAt(nt))?(a=t.charAt(nt),nt++):(a=e,0===ot&&pt(w));a!==e;)i.push(a),W.test(t.charAt(nt))?(a=t.charAt(nt),nt++):(a=e,0===ot&&pt(w));i!==e?(et=r,r=n=E()):(nt=r,r=e)}else nt=r,r=e;return ot--,r===e&&(n=e,0===ot&&pt(C)),r}function vt(){var r,n,i;if(r=nt,n=[],T.test(t.charAt(nt))?(i=t.charAt(nt),nt++):(i=e,0===ot&&pt(_)),i!==e)for(;i!==e;)n.push(i),T.test(t.charAt(nt))?(i=t.charAt(nt),nt++):(i=e,0===ot&&pt(_));else n=e;return n!==e&&(et=r,n=j()),r=n}function yt(){var r,n,i,a;return r=nt,39===t.charCodeAt(nt)?(n=k,nt++):(n=e,0===ot&&pt(Q)),n!==e&&(i=function(){var t,r,n;if(t=nt,r=[],(n=$t())!==e)for(;n!==e;)r.push(n),n=$t();else r=e;r!==e&&(et=t,r=O(r));return t=r}())!==e?(39===t.charCodeAt(nt)?(a=k,nt++):(a=e,0===ot&&pt(Q)),a!==e?(et=r,r=n=F(i)):(nt=r,r=e)):(nt=r,r=e),r}function St(){var r,n,i,a;if(r=nt,34===t.charCodeAt(nt)?(n=z,nt++):(n=e,0===ot&&pt(R)),n!==e){for(i=[],(a=Ct())===e&&(a=mt());a!==e;)i.push(a),(a=Ct())===e&&(a=mt());i!==e?(34===t.charCodeAt(nt)?(a=z,nt++):(a=e,0===ot&&pt(R)),a!==e?(et=r,r=n=Z(i)):(nt=r,r=e)):(nt=r,r=e)}else nt=r,r=e;return r}function xt(){var t,r,n;if(t=nt,r=[],(n=Wt())!==e)for(;n!==e;)r.push(n),n=Wt();else r=e;return r!==e&&(et=t,r=M(r)),t=r}function Ct(){var t,r,n;if(t=nt,r=[],(n=Vt())!==e)for(;n!==e;)r.push(n),n=Vt();else r=e;return r!==e&&(et=t,r=O(r)),t=r}function Vt(){var r,n,i;return r=nt,92===t.charCodeAt(nt)?(n=P,nt++):(n=e,0===ot&&pt(U)),n!==e?(q.test(t.charAt(nt))?(i=t.charAt(nt),nt++):(i=e,0===ot&&pt(B)),i!==e?(et=r,r=n=D(i)):(nt=r,r=e)):(nt=r,r=e),r===e&&(r=nt,t.substr(nt,2)===G?(n=G,nt+=2):(n=e,0===ot&&pt(H)),n!==e&&(et=r,n=I()),(r=n)===e&&(r=nt,n=nt,ot++,J.test(t.charAt(nt))?(i=t.charAt(nt),nt++):(i=e,0===ot&&pt(K)),ot--,i===e?n=void 0:(nt=n,n=e),n!==e?(t.length>nt?(i=t.charAt(nt),nt++):(i=e,0===ot&&pt(L)),i!==e?(et=r,r=n=N(i)):(nt=r,r=e)):(nt=r,r=e))),r}function $t(){var r,n,i;return r=nt,n=nt,ot++,39===t.charCodeAt(nt)?(i=k,nt++):(i=e,0===ot&&pt(Q)),ot--,i===e?n=void 0:(nt=n,n=e),n!==e?(t.length>nt?(i=t.charAt(nt),nt++):(i=e,0===ot&&pt(L)),i!==e?(et=r,r=n=N(i)):(nt=r,r=e)):(nt=r,r=e),r}function Wt(){var r,n,i;return(r=Et())===e&&(r=nt,n=nt,ot++,X.test(t.charAt(nt))?(i=t.charAt(nt),nt++):(i=e,0===ot&&pt(Y)),i===e&&(i=vt()),ot--,i===e?n=void 0:(nt=n,n=e),n!==e?(t.length>nt?(i=t.charAt(nt),nt++):(i=e,0===ot&&pt(L)),i!==e?(et=r,r=n=N(i)):(nt=r,r=e)):(nt=r,r=e)),r}function wt(){var r,n,i;return(r=Et())===e&&(r=nt,n=nt,ot++,tt.test(t.charAt(nt))?(i=t.charAt(nt),nt++):(i=e,0===ot&&pt(rt)),i===e&&(i=vt()),ot--,i===e?n=void 0:(nt=n,n=e),n!==e?(t.length>nt?(i=t.charAt(nt),nt++):(i=e,0===ot&&pt(L)),i!==e?(et=r,r=n=N(i)):(nt=r,r=e)):(nt=r,r=e)),r}function Et(){var r,n,i;return r=nt,t.substr(nt,2)===G?(n=G,nt+=2):(n=e,0===ot&&pt(H)),n!==e&&(et=r,n=I()),(r=n)===e&&(r=nt,92===t.charCodeAt(nt)?(n=P,nt++):(n=e,0===ot&&pt(U)),n!==e?(t.length>nt?(i=t.charAt(nt),nt++):(i=e,0===ot&&pt(L)),i!==e?(et=r,r=n=D(i)):(nt=r,r=e)):(nt=r,r=e)),r}const{QuotedString:Tt,VerbatimString:_t,Variable:jt,VariableAssignment:kt,Word:Qt,Whitespace:Ft}=tokens;function zt(t){return 1===t.length?t[0]:t}if((n=a())!==e&&nt===t.length)return n;throw n!==e&&nt<t.length&&pt({type:"end"}),Rt=st,Zt=at<t.length?t.charAt(at):null,Mt=at<t.length?ht(at,at+1):ht(at,at),new peg$SyntaxError(peg$SyntaxError.buildMessage(Rt,Zt),Rt,Zt,Mt);var Rt,Zt,Mt}peg$subclass(peg$SyntaxError,Error),peg$SyntaxError.buildMessage=function(t,r){var n={literal:function(t){return'"'+i(t.text)+'"'},class:function(t){var r,n="";for(r=0;r<t.parts.length;r++)n+=t.parts[r]instanceof Array?a(t.parts[r][0])+"-"+a(t.parts[r][1]):a(t.parts[r]);return"["+(t.inverted?"^":"")+n+"]"},any:function(t){return"any character"},end:function(t){return"end of input"},other:function(t){return t.description}};function e(t){return t.charCodeAt(0).toString(16).toUpperCase()}function i(t){return t.replace(/\\/g,"\\\\").replace(/"/g,'\\"').replace(/\0/g,"\\0").replace(/\t/g,"\\t").replace(/\n/g,"\\n").replace(/\r/g,"\\r").replace(/[\x00-\x0F]/g,(function(t){return"\\x0"+e(t)})).replace(/[\x10-\x1F\x7F-\x9F]/g,(function(t){return"\\x"+e(t)}))}function a(t){return t.replace(/\\/g,"\\\\").replace(/\]/g,"\\]").replace(/\^/g,"\\^").replace(/-/g,"\\-").replace(/\0/g,"\\0").replace(/\t/g,"\\t").replace(/\n/g,"\\n").replace(/\r/g,"\\r").replace(/[\x00-\x0F]/g,(function(t){return"\\x0"+e(t)})).replace(/[\x10-\x1F\x7F-\x9F]/g,(function(t){return"\\x"+e(t)}))}return"Expected "+function(t){var r,e,i,a=new Array(t.length);for(r=0;r<t.length;r++)a[r]=(i=t[r],n[i.type](i));if(a.sort(),a.length>0){for(r=1,e=1;r<a.length;r++)a[r-1]!==a[r]&&(a[e]=a[r],e++);a.length=e}switch(a.length){case 1:return a[0];case 2:return a[0]+" or "+a[1];default:return a.slice(0,-1).join(", ")+", or "+a[a.length-1]}}(t)+" but "+function(t){return t?'"'+i(t)+'"':"end of input"}(r)+" found."};var parser_1=(parser={SyntaxError:peg$SyntaxError,parse:peg$parse}).parse;function collapseWhitespace(t){if(Array.isArray(t)){let r=!1,n=!1;return transformChildren(t,t=>{if(t instanceof Whitespace)return void(r=!0);const e=collapseWhitespace(t);if(null==e)return;const i=r&&n;return r=!1,n=!0,i?[new Whitespace(" "),e]:e})}if(t instanceof SubstitutedVariable){const r=t.value;if("string"==typeof r){const n=r.trim().replace(/\s+/g," ");return n===r?t:new SubstitutedVariable(t.name,n)}return collapseWhitespace(r)}return t}function stringify(t){var r;if(Array.isArray(t))return transformChildren(t,stringify).join("");if(t instanceof Variable)return null;if(t instanceof SubstitutedVariable){const r=t.value;return null==r?null:"string"==typeof r?r:stringify(r)}return t instanceof VariableAssignment?`${t.name}=${r=stringify(t.value),null!=r?r:""}`:t instanceof QuotedString?t.contents.reduce((t,r)=>{var n;return"string"==typeof r?t+r:t+(null!=(n=stringify(r))?n:"")},""):t instanceof Word||t instanceof VerbatimString||t instanceof Whitespace?t.contents:null}function substitute(t,r,n=!1){if(t instanceof Variable){let e=r[t.name];return e||(e=t.fallback?substitute(t.fallback,r,n):null),new SubstitutedVariable(t.name,e)}if(t instanceof VariableAssignment){const e=substitute(t.value,r,n),i=t.value===e?t:new VariableAssignment(t.name,e);if(n){const n=stringify(collapseWhitespace(e));r[t.name]=n}return i}return transformChildren(t,t=>substitute(t,r,n))}function toShellArgs(t){if(Array.isArray(t)){const r=[];let n=!1;for(const e of t)if(e instanceof Whitespace)n=!0;else{const t=toShellArgs(e);null!==t&&(n||0===r.length?r.push(t):r[r.length-1]+=t,n=!1)}return r}if(t instanceof Variable)return null;if(t instanceof SubstitutedVariable){return null==t.value?null:join(toShellArgs(t.value))}return t instanceof VariableAssignment?`${t.name}=${join(toShellArgs(t.value))}`:t instanceof QuotedString?t.contents.reduce((t,r)=>{var n;return"string"==typeof r?t+r:t+(null!=(n=join(toShellArgs(r)))?n:"")},""):t instanceof Word||t instanceof VerbatimString||t instanceof Whitespace?t.contents:void 0}function join(t){return null==t?"":"string"==typeof t?t:t.join("")}function extractEnvironment(t,r={}){const n=e=>{if(e instanceof VariableAssignment){const t=e,n=stringify(collapseWhitespace(substitute(t.value,r,!1)));r[t.name]=n}else transformChildren(t,n);return e};return n(t),r}const parse=t=>parser_1(t),replace=(t,r)=>{return stringify(collapseWhitespace(substitute(parser_1(t),r)))};exports.QuotedString=QuotedString,exports.SubstitutedVariable=SubstitutedVariable,exports.TransformChildren=TransformChildren,exports.Variable=Variable,exports.VariableAssignment=VariableAssignment,exports.VerbatimString=VerbatimString,exports.Whitespace=Whitespace,exports.Word=Word,exports.collapseWhitespace=collapseWhitespace,exports.extractEnvironment=extractEnvironment,exports.parse=parse,exports.replace=replace,exports.stringify=stringify,exports.substitute=substitute,exports.toShellArgs=toShellArgs,exports.transformChildren=transformChildren;
+'use strict';
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+const TransformChildren = Symbol("transform children");
+
+function transformChildren(value, transformer) {
+    if (value != null) {
+        if (Array.isArray(value)) {
+            return transformArray(value, transformer);
+        }
+        if (typeof value === "object" &&
+            typeof value[TransformChildren] === "function") {
+            return value[TransformChildren](transformer);
+        }
+    }
+    return value;
+}
+/** Transforms an array, returning a new array only if any elements change. Nullish transform
+ * results are removed, and array transform results are flattened (by one level only.) */
+function transformArray(value, transformer) {
+    // Scan through the children until the transform function changes one of them.
+    for (let i = 0, len = value.length; i < len; ++i) {
+        let item = value[i];
+        let transformed = transformer(item);
+        if (item === transformed)
+            continue;
+        // Once a child has changed: create a new list, apply the changes, and return it.
+        const newList = value.slice(0, i);
+        push(newList, transformed);
+        for (++i; i < len; ++i) {
+            item = value[i];
+            transformed = transformer(item);
+            push(newList, transformed);
+        }
+        return newList;
+    }
+    // When there are no changes, return this object.
+    return value;
+}
+/** Push an item, or flatten an array of items into the list argument. */
+function push(list, items) {
+    if (items != null) {
+        if (Array.isArray(items)) {
+            list.push(...items);
+        }
+        else {
+            list.push(items);
+        }
+    }
+}
+
+/** A variable reference like $VAR, ${VAR}, or ${VAR:-fallback}. */
+class Variable {
+    constructor(name, fallbackType = null, fallback = null) {
+        this.name = name;
+        this.fallbackType = fallbackType;
+        this.fallback = fallback;
+    }
+    /** Stringifies the variable into it's bash version, including fallback. */
+    toString() {
+        var _a, _b;
+        return ("${" + this.name + (_a = this.fallbackType, (_a !== null && _a !== void 0 ? _a : "")) + (_b = this.fallback, (_b !== null && _b !== void 0 ? _b : "")) + "}");
+    }
+    [TransformChildren](transformer) {
+        const contents = this.fallback;
+        const transformed = transformChildren(contents, transformer);
+        return transformed !== contents
+            ? new Variable(this.name, this.fallbackType, transformed)
+            : this;
+    }
+}
+
+/** A variable assignment like VAR=5, VAR="hello", or VAR=${OTHER}. */
+class VariableAssignment {
+    constructor(name, value) {
+        this.name = name;
+        this.value = value;
+    }
+    toString() {
+        return this.name + "=" + this.value;
+    }
+    withValue(newValue) {
+        return this.value === newValue
+            ? this
+            : new VariableAssignment(this.name, newValue);
+    }
+    [TransformChildren](transformer) {
+        const contents = this.value;
+        const transformed = transformChildren(contents, transformer);
+        return transformed !== contents
+            ? new VariableAssignment(this.name, transformed)
+            : this;
+    }
+}
+
+/** Text quoted with double quotes: ". Variables substitution is performed in these strings and
+ * whitespace is preserved, but no other characters like ' have any special meaning. */
+class QuotedString {
+    constructor(contents) {
+        this.contents = contents;
+    }
+    toString() {
+        return `"${this.contents}"`;
+    }
+    [TransformChildren](transformer) {
+        const contents = this.contents;
+        const transformed = transformChildren(contents, transformer);
+        return transformed !== contents ? new QuotedString(transformed) : this;
+    }
+}
+
+/** Text quoted with single quotes: '. No variable substitution is performed in these strings,
+ * whitespace is preserved, and no other characters have special meaning (like double quotes), so
+ * the contents are used verbatim. */
+class VerbatimString {
+    constructor(contents) {
+        this.contents = contents;
+    }
+    toString() {
+        return `'${this.contents}'`;
+    }
+}
+
+/** An unquoted word containing no whitespace. */
+class Word {
+    constructor(contents) {
+        this.contents = contents;
+    }
+    toString() {
+        return `(${this.contents})`;
+    }
+}
+
+/** Some whitespace between words, variables, or quoted strings. This is generally either stripped
+ * or collapsed. */
+class Whitespace {
+    constructor(contents) {
+        this.contents = contents;
+    }
+    toString() {
+        return `(${this.contents})`;
+    }
+}
+
+
+
+var tokens = /*#__PURE__*/Object.freeze({
+  __proto__: null,
+  Variable: Variable,
+  VariableAssignment: VariableAssignment,
+  QuotedString: QuotedString,
+  VerbatimString: VerbatimString,
+  Word: Word,
+  Whitespace: Whitespace,
+  TransformChildren: TransformChildren,
+  transformChildren: transformChildren
+});
+
+var parser = /*
+ * Generated by PEG.js 0.10.0.
+ *
+ * http://pegjs.org/
+ */
+
+"use strict";
+
+function peg$subclass(child, parent) {
+  function ctor() { this.constructor = child; }
+  ctor.prototype = parent.prototype;
+  child.prototype = new ctor();
+}
+
+function peg$SyntaxError(message, expected, found, location) {
+  this.message  = message;
+  this.expected = expected;
+  this.found    = found;
+  this.location = location;
+  this.name     = "SyntaxError";
+
+  if (typeof Error.captureStackTrace === "function") {
+    Error.captureStackTrace(this, peg$SyntaxError);
+  }
+}
+
+peg$subclass(peg$SyntaxError, Error);
+
+peg$SyntaxError.buildMessage = function(expected, found) {
+  var DESCRIBE_EXPECTATION_FNS = {
+        literal: function(expectation) {
+          return "\"" + literalEscape(expectation.text) + "\"";
+        },
+
+        "class": function(expectation) {
+          var escapedParts = "",
+              i;
+
+          for (i = 0; i < expectation.parts.length; i++) {
+            escapedParts += expectation.parts[i] instanceof Array
+              ? classEscape(expectation.parts[i][0]) + "-" + classEscape(expectation.parts[i][1])
+              : classEscape(expectation.parts[i]);
+          }
+
+          return "[" + (expectation.inverted ? "^" : "") + escapedParts + "]";
+        },
+
+        any: function(expectation) {
+          return "any character";
+        },
+
+        end: function(expectation) {
+          return "end of input";
+        },
+
+        other: function(expectation) {
+          return expectation.description;
+        }
+      };
+
+  function hex(ch) {
+    return ch.charCodeAt(0).toString(16).toUpperCase();
+  }
+
+  function literalEscape(s) {
+    return s
+      .replace(/\\/g, '\\\\')
+      .replace(/"/g,  '\\"')
+      .replace(/\0/g, '\\0')
+      .replace(/\t/g, '\\t')
+      .replace(/\n/g, '\\n')
+      .replace(/\r/g, '\\r')
+      .replace(/[\x00-\x0F]/g,          function(ch) { return '\\x0' + hex(ch); })
+      .replace(/[\x10-\x1F\x7F-\x9F]/g, function(ch) { return '\\x'  + hex(ch); });
+  }
+
+  function classEscape(s) {
+    return s
+      .replace(/\\/g, '\\\\')
+      .replace(/\]/g, '\\]')
+      .replace(/\^/g, '\\^')
+      .replace(/-/g,  '\\-')
+      .replace(/\0/g, '\\0')
+      .replace(/\t/g, '\\t')
+      .replace(/\n/g, '\\n')
+      .replace(/\r/g, '\\r')
+      .replace(/[\x00-\x0F]/g,          function(ch) { return '\\x0' + hex(ch); })
+      .replace(/[\x10-\x1F\x7F-\x9F]/g, function(ch) { return '\\x'  + hex(ch); });
+  }
+
+  function describeExpectation(expectation) {
+    return DESCRIBE_EXPECTATION_FNS[expectation.type](expectation);
+  }
+
+  function describeExpected(expected) {
+    var descriptions = new Array(expected.length),
+        i, j;
+
+    for (i = 0; i < expected.length; i++) {
+      descriptions[i] = describeExpectation(expected[i]);
+    }
+
+    descriptions.sort();
+
+    if (descriptions.length > 0) {
+      for (i = 1, j = 1; i < descriptions.length; i++) {
+        if (descriptions[i - 1] !== descriptions[i]) {
+          descriptions[j] = descriptions[i];
+          j++;
+        }
+      }
+      descriptions.length = j;
+    }
+
+    switch (descriptions.length) {
+      case 1:
+        return descriptions[0];
+
+      case 2:
+        return descriptions[0] + " or " + descriptions[1];
+
+      default:
+        return descriptions.slice(0, -1).join(", ")
+          + ", or "
+          + descriptions[descriptions.length - 1];
+    }
+  }
+
+  function describeFound(found) {
+    return found ? "\"" + literalEscape(found) + "\"" : "end of input";
+  }
+
+  return "Expected " + describeExpected(expected) + " but " + describeFound(found) + " found.";
+};
+
+function peg$parse(input, options) {
+  options = options !== void 0 ? options : {};
+
+  var peg$FAILED = {},
+
+      peg$startRuleFunctions = { start: peg$parsestart, VariableValue: peg$parseVariableValue },
+      peg$startRuleFunction  = peg$parsestart,
+
+      peg$c0 = function(value) { return singleOrList(value) },
+      peg$c1 = "=",
+      peg$c2 = peg$literalExpectation("=", false),
+      peg$c3 = function(name, value) {
+          return new VariableAssignment(name, singleOrList(value));
+        },
+      peg$c4 = "${",
+      peg$c5 = peg$literalExpectation("${", false),
+      peg$c6 = ":-",
+      peg$c7 = peg$literalExpectation(":-", false),
+      peg$c8 = ":=",
+      peg$c9 = peg$literalExpectation(":=", false),
+      peg$c10 = "}",
+      peg$c11 = peg$literalExpectation("}", false),
+      peg$c12 = function(name, fallbackType, fallback) {
+          return new Variable(name, fallbackType, fallback);
+        },
+      peg$c13 = function(name) { return new Variable(name); },
+      peg$c14 = "$",
+      peg$c15 = peg$literalExpectation("$", false),
+      peg$c16 = function() { return new VerbatimString("$"); },
+      peg$c17 = function(tokens) {
+          return singleOrList(tokens);
+        },
+      peg$c18 = peg$otherExpectation("variable name"),
+      peg$c19 = /^[a-zA-Z_]/,
+      peg$c20 = peg$classExpectation([["a", "z"], ["A", "Z"], "_"], false, false),
+      peg$c21 = /^[a-zA-Z_0-9]/,
+      peg$c22 = peg$classExpectation([["a", "z"], ["A", "Z"], "_", ["0", "9"]], false, false),
+      peg$c23 = function() { return text(); },
+      peg$c24 = /^[ \t\n\r]/,
+      peg$c25 = peg$classExpectation([" ", "\t", "\n", "\r"], false, false),
+      peg$c26 = function() { return new Whitespace(text()); },
+      peg$c27 = /^[^ \t\n\r]/,
+      peg$c28 = peg$classExpectation([" ", "\t", "\n", "\r"], true, false),
+      peg$c29 = function() { return new Word(text()); },
+      peg$c30 = "'",
+      peg$c31 = peg$literalExpectation("'", false),
+      peg$c32 = function(chars) {
+          return new VerbatimString(chars);
+        },
+      peg$c33 = "\"",
+      peg$c34 = peg$literalExpectation("\"", false),
+      peg$c35 = function(tokens) {
+          return new QuotedString(tokens);
+        },
+      peg$c36 = function(chars) { return new Word(chars.join("")); },
+      peg$c37 = function(chars) { return chars.join(""); },
+      peg$c38 = "\\",
+      peg$c39 = peg$literalExpectation("\\", false),
+      peg$c40 = /^[$"`\\]/,
+      peg$c41 = peg$classExpectation(["$", "\"", "`", "\\"], false, false),
+      peg$c42 = function(escaped) { return escaped; },
+      peg$c43 = "\\\n",
+      peg$c44 = peg$literalExpectation("\\\n", false),
+      peg$c45 = function() { return ""; },
+      peg$c46 = /^[$"]/,
+      peg$c47 = peg$classExpectation(["$", "\""], false, false),
+      peg$c48 = peg$anyExpectation(),
+      peg$c49 = function(char) { return char; },
+      peg$c50 = /^[$}'"]/,
+      peg$c51 = peg$classExpectation(["$", "}", "'", "\""], false, false),
+      peg$c52 = /^[$'"]/,
+      peg$c53 = peg$classExpectation(["$", "'", "\""], false, false),
+
+      peg$currPos          = 0,
+      peg$savedPos         = 0,
+      peg$posDetailsCache  = [{ line: 1, column: 1 }],
+      peg$maxFailPos       = 0,
+      peg$maxFailExpected  = [],
+      peg$silentFails      = 0,
+
+      peg$result;
+
+  if ("startRule" in options) {
+    if (!(options.startRule in peg$startRuleFunctions)) {
+      throw new Error("Can't start parsing from rule \"" + options.startRule + "\".");
+    }
+
+    peg$startRuleFunction = peg$startRuleFunctions[options.startRule];
+  }
+
+  function text() {
+    return input.substring(peg$savedPos, peg$currPos);
+  }
+
+  function peg$literalExpectation(text, ignoreCase) {
+    return { type: "literal", text: text, ignoreCase: ignoreCase };
+  }
+
+  function peg$classExpectation(parts, inverted, ignoreCase) {
+    return { type: "class", parts: parts, inverted: inverted, ignoreCase: ignoreCase };
+  }
+
+  function peg$anyExpectation() {
+    return { type: "any" };
+  }
+
+  function peg$endExpectation() {
+    return { type: "end" };
+  }
+
+  function peg$otherExpectation(description) {
+    return { type: "other", description: description };
+  }
+
+  function peg$computePosDetails(pos) {
+    var details = peg$posDetailsCache[pos], p;
+
+    if (details) {
+      return details;
+    } else {
+      p = pos - 1;
+      while (!peg$posDetailsCache[p]) {
+        p--;
+      }
+
+      details = peg$posDetailsCache[p];
+      details = {
+        line:   details.line,
+        column: details.column
+      };
+
+      while (p < pos) {
+        if (input.charCodeAt(p) === 10) {
+          details.line++;
+          details.column = 1;
+        } else {
+          details.column++;
+        }
+
+        p++;
+      }
+
+      peg$posDetailsCache[pos] = details;
+      return details;
+    }
+  }
+
+  function peg$computeLocation(startPos, endPos) {
+    var startPosDetails = peg$computePosDetails(startPos),
+        endPosDetails   = peg$computePosDetails(endPos);
+
+    return {
+      start: {
+        offset: startPos,
+        line:   startPosDetails.line,
+        column: startPosDetails.column
+      },
+      end: {
+        offset: endPos,
+        line:   endPosDetails.line,
+        column: endPosDetails.column
+      }
+    };
+  }
+
+  function peg$fail(expected) {
+    if (peg$currPos < peg$maxFailPos) { return; }
+
+    if (peg$currPos > peg$maxFailPos) {
+      peg$maxFailPos = peg$currPos;
+      peg$maxFailExpected = [];
+    }
+
+    peg$maxFailExpected.push(expected);
+  }
+
+  function peg$buildStructuredError(expected, found, location) {
+    return new peg$SyntaxError(
+      peg$SyntaxError.buildMessage(expected, found),
+      expected,
+      found,
+      location
+    );
+  }
+
+  function peg$parsestart() {
+    var s0, s1;
+
+    s0 = [];
+    s1 = peg$parseVariableAssignment();
+    if (s1 === peg$FAILED) {
+      s1 = peg$parseWordToken();
+      if (s1 === peg$FAILED) {
+        s1 = peg$parseWhitespace();
+      }
+    }
+    while (s1 !== peg$FAILED) {
+      s0.push(s1);
+      s1 = peg$parseVariableAssignment();
+      if (s1 === peg$FAILED) {
+        s1 = peg$parseWordToken();
+        if (s1 === peg$FAILED) {
+          s1 = peg$parseWhitespace();
+        }
+      }
+    }
+
+    return s0;
+  }
+
+  function peg$parseVariableValue() {
+    var s0, s1, s2;
+
+    s0 = peg$currPos;
+    s1 = [];
+    s2 = peg$parseNotWhitespace();
+    if (s2 === peg$FAILED) {
+      s2 = peg$parseWhitespace();
+    }
+    while (s2 !== peg$FAILED) {
+      s1.push(s2);
+      s2 = peg$parseNotWhitespace();
+      if (s2 === peg$FAILED) {
+        s2 = peg$parseWhitespace();
+      }
+    }
+    if (s1 !== peg$FAILED) {
+      peg$savedPos = s0;
+      s1 = peg$c0(s1);
+    }
+    s0 = s1;
+
+    return s0;
+  }
+
+  function peg$parseWordToken() {
+    var s0;
+
+    s0 = peg$parseVerbatimString();
+    if (s0 === peg$FAILED) {
+      s0 = peg$parseQuotedString();
+      if (s0 === peg$FAILED) {
+        s0 = peg$parseWord();
+        if (s0 === peg$FAILED) {
+          s0 = peg$parseVariable();
+        }
+      }
+    }
+
+    return s0;
+  }
+
+  function peg$parseVariableAssignment() {
+    var s0, s1, s2, s3, s4;
+
+    s0 = peg$currPos;
+    s1 = peg$parseVarName();
+    if (s1 !== peg$FAILED) {
+      if (input.charCodeAt(peg$currPos) === 61) {
+        s2 = peg$c1;
+        peg$currPos++;
+      } else {
+        s2 = peg$FAILED;
+        if (peg$silentFails === 0) { peg$fail(peg$c2); }
+      }
+      if (s2 !== peg$FAILED) {
+        s3 = [];
+        s4 = peg$parseWordToken();
+        if (s4 !== peg$FAILED) {
+          while (s4 !== peg$FAILED) {
+            s3.push(s4);
+            s4 = peg$parseWordToken();
+          }
+        } else {
+          s3 = peg$FAILED;
+        }
+        if (s3 !== peg$FAILED) {
+          peg$savedPos = s0;
+          s1 = peg$c3(s1, s3);
+          s0 = s1;
+        } else {
+          peg$currPos = s0;
+          s0 = peg$FAILED;
+        }
+      } else {
+        peg$currPos = s0;
+        s0 = peg$FAILED;
+      }
+    } else {
+      peg$currPos = s0;
+      s0 = peg$FAILED;
+    }
+
+    return s0;
+  }
+
+  function peg$parseVariable() {
+    var s0, s1, s2, s3, s4, s5;
+
+    s0 = peg$currPos;
+    if (input.substr(peg$currPos, 2) === peg$c4) {
+      s1 = peg$c4;
+      peg$currPos += 2;
+    } else {
+      s1 = peg$FAILED;
+      if (peg$silentFails === 0) { peg$fail(peg$c5); }
+    }
+    if (s1 !== peg$FAILED) {
+      s2 = peg$parseVarName();
+      if (s2 !== peg$FAILED) {
+        if (input.substr(peg$currPos, 2) === peg$c6) {
+          s3 = peg$c6;
+          peg$currPos += 2;
+        } else {
+          s3 = peg$FAILED;
+          if (peg$silentFails === 0) { peg$fail(peg$c7); }
+        }
+        if (s3 === peg$FAILED) {
+          if (input.substr(peg$currPos, 2) === peg$c8) {
+            s3 = peg$c8;
+            peg$currPos += 2;
+          } else {
+            s3 = peg$FAILED;
+            if (peg$silentFails === 0) { peg$fail(peg$c9); }
+          }
+        }
+        if (s3 !== peg$FAILED) {
+          s4 = peg$parseFallback();
+          if (s4 !== peg$FAILED) {
+            if (input.charCodeAt(peg$currPos) === 125) {
+              s5 = peg$c10;
+              peg$currPos++;
+            } else {
+              s5 = peg$FAILED;
+              if (peg$silentFails === 0) { peg$fail(peg$c11); }
+            }
+            if (s5 !== peg$FAILED) {
+              peg$savedPos = s0;
+              s1 = peg$c12(s2, s3, s4);
+              s0 = s1;
+            } else {
+              peg$currPos = s0;
+              s0 = peg$FAILED;
+            }
+          } else {
+            peg$currPos = s0;
+            s0 = peg$FAILED;
+          }
+        } else {
+          peg$currPos = s0;
+          s0 = peg$FAILED;
+        }
+      } else {
+        peg$currPos = s0;
+        s0 = peg$FAILED;
+      }
+    } else {
+      peg$currPos = s0;
+      s0 = peg$FAILED;
+    }
+    if (s0 === peg$FAILED) {
+      s0 = peg$currPos;
+      if (input.substr(peg$currPos, 2) === peg$c4) {
+        s1 = peg$c4;
+        peg$currPos += 2;
+      } else {
+        s1 = peg$FAILED;
+        if (peg$silentFails === 0) { peg$fail(peg$c5); }
+      }
+      if (s1 !== peg$FAILED) {
+        s2 = peg$parseVarName();
+        if (s2 !== peg$FAILED) {
+          if (input.charCodeAt(peg$currPos) === 125) {
+            s3 = peg$c10;
+            peg$currPos++;
+          } else {
+            s3 = peg$FAILED;
+            if (peg$silentFails === 0) { peg$fail(peg$c11); }
+          }
+          if (s3 !== peg$FAILED) {
+            peg$savedPos = s0;
+            s1 = peg$c13(s2);
+            s0 = s1;
+          } else {
+            peg$currPos = s0;
+            s0 = peg$FAILED;
+          }
+        } else {
+          peg$currPos = s0;
+          s0 = peg$FAILED;
+        }
+      } else {
+        peg$currPos = s0;
+        s0 = peg$FAILED;
+      }
+      if (s0 === peg$FAILED) {
+        s0 = peg$currPos;
+        if (input.charCodeAt(peg$currPos) === 36) {
+          s1 = peg$c14;
+          peg$currPos++;
+        } else {
+          s1 = peg$FAILED;
+          if (peg$silentFails === 0) { peg$fail(peg$c15); }
+        }
+        if (s1 !== peg$FAILED) {
+          s2 = peg$parseVarName();
+          if (s2 !== peg$FAILED) {
+            peg$savedPos = s0;
+            s1 = peg$c13(s2);
+            s0 = s1;
+          } else {
+            peg$currPos = s0;
+            s0 = peg$FAILED;
+          }
+        } else {
+          peg$currPos = s0;
+          s0 = peg$FAILED;
+        }
+        if (s0 === peg$FAILED) {
+          s0 = peg$currPos;
+          if (input.charCodeAt(peg$currPos) === 36) {
+            s1 = peg$c14;
+            peg$currPos++;
+          } else {
+            s1 = peg$FAILED;
+            if (peg$silentFails === 0) { peg$fail(peg$c15); }
+          }
+          if (s1 !== peg$FAILED) {
+            peg$savedPos = s0;
+            s1 = peg$c16();
+          }
+          s0 = s1;
+        }
+      }
+    }
+
+    return s0;
+  }
+
+  function peg$parseFallback() {
+    var s0, s1, s2;
+
+    s0 = peg$currPos;
+    s1 = [];
+    s2 = peg$parseVerbatimString();
+    if (s2 === peg$FAILED) {
+      s2 = peg$parseQuotedString();
+      if (s2 === peg$FAILED) {
+        s2 = peg$parseWordInBrace();
+        if (s2 === peg$FAILED) {
+          s2 = peg$parseVariable();
+          if (s2 === peg$FAILED) {
+            s2 = peg$parseWhitespace();
+          }
+        }
+      }
+    }
+    while (s2 !== peg$FAILED) {
+      s1.push(s2);
+      s2 = peg$parseVerbatimString();
+      if (s2 === peg$FAILED) {
+        s2 = peg$parseQuotedString();
+        if (s2 === peg$FAILED) {
+          s2 = peg$parseWordInBrace();
+          if (s2 === peg$FAILED) {
+            s2 = peg$parseVariable();
+            if (s2 === peg$FAILED) {
+              s2 = peg$parseWhitespace();
+            }
+          }
+        }
+      }
+    }
+    if (s1 !== peg$FAILED) {
+      peg$savedPos = s0;
+      s1 = peg$c17(s1);
+    }
+    s0 = s1;
+
+    return s0;
+  }
+
+  function peg$parseVarName() {
+    var s0, s1, s2, s3;
+
+    peg$silentFails++;
+    s0 = peg$currPos;
+    if (peg$c19.test(input.charAt(peg$currPos))) {
+      s1 = input.charAt(peg$currPos);
+      peg$currPos++;
+    } else {
+      s1 = peg$FAILED;
+      if (peg$silentFails === 0) { peg$fail(peg$c20); }
+    }
+    if (s1 !== peg$FAILED) {
+      s2 = [];
+      if (peg$c21.test(input.charAt(peg$currPos))) {
+        s3 = input.charAt(peg$currPos);
+        peg$currPos++;
+      } else {
+        s3 = peg$FAILED;
+        if (peg$silentFails === 0) { peg$fail(peg$c22); }
+      }
+      while (s3 !== peg$FAILED) {
+        s2.push(s3);
+        if (peg$c21.test(input.charAt(peg$currPos))) {
+          s3 = input.charAt(peg$currPos);
+          peg$currPos++;
+        } else {
+          s3 = peg$FAILED;
+          if (peg$silentFails === 0) { peg$fail(peg$c22); }
+        }
+      }
+      if (s2 !== peg$FAILED) {
+        peg$savedPos = s0;
+        s1 = peg$c23();
+        s0 = s1;
+      } else {
+        peg$currPos = s0;
+        s0 = peg$FAILED;
+      }
+    } else {
+      peg$currPos = s0;
+      s0 = peg$FAILED;
+    }
+    peg$silentFails--;
+    if (s0 === peg$FAILED) {
+      s1 = peg$FAILED;
+      if (peg$silentFails === 0) { peg$fail(peg$c18); }
+    }
+
+    return s0;
+  }
+
+  function peg$parseWhitespace() {
+    var s0, s1, s2;
+
+    s0 = peg$currPos;
+    s1 = [];
+    if (peg$c24.test(input.charAt(peg$currPos))) {
+      s2 = input.charAt(peg$currPos);
+      peg$currPos++;
+    } else {
+      s2 = peg$FAILED;
+      if (peg$silentFails === 0) { peg$fail(peg$c25); }
+    }
+    if (s2 !== peg$FAILED) {
+      while (s2 !== peg$FAILED) {
+        s1.push(s2);
+        if (peg$c24.test(input.charAt(peg$currPos))) {
+          s2 = input.charAt(peg$currPos);
+          peg$currPos++;
+        } else {
+          s2 = peg$FAILED;
+          if (peg$silentFails === 0) { peg$fail(peg$c25); }
+        }
+      }
+    } else {
+      s1 = peg$FAILED;
+    }
+    if (s1 !== peg$FAILED) {
+      peg$savedPos = s0;
+      s1 = peg$c26();
+    }
+    s0 = s1;
+
+    return s0;
+  }
+
+  function peg$parseNotWhitespace() {
+    var s0, s1, s2;
+
+    s0 = peg$currPos;
+    s1 = [];
+    if (peg$c27.test(input.charAt(peg$currPos))) {
+      s2 = input.charAt(peg$currPos);
+      peg$currPos++;
+    } else {
+      s2 = peg$FAILED;
+      if (peg$silentFails === 0) { peg$fail(peg$c28); }
+    }
+    if (s2 !== peg$FAILED) {
+      while (s2 !== peg$FAILED) {
+        s1.push(s2);
+        if (peg$c27.test(input.charAt(peg$currPos))) {
+          s2 = input.charAt(peg$currPos);
+          peg$currPos++;
+        } else {
+          s2 = peg$FAILED;
+          if (peg$silentFails === 0) { peg$fail(peg$c28); }
+        }
+      }
+    } else {
+      s1 = peg$FAILED;
+    }
+    if (s1 !== peg$FAILED) {
+      peg$savedPos = s0;
+      s1 = peg$c29();
+    }
+    s0 = s1;
+
+    return s0;
+  }
+
+  function peg$parseVerbatimString() {
+    var s0, s1, s2, s3;
+
+    s0 = peg$currPos;
+    if (input.charCodeAt(peg$currPos) === 39) {
+      s1 = peg$c30;
+      peg$currPos++;
+    } else {
+      s1 = peg$FAILED;
+      if (peg$silentFails === 0) { peg$fail(peg$c31); }
+    }
+    if (s1 !== peg$FAILED) {
+      s2 = peg$parseVerbatimChars();
+      if (s2 !== peg$FAILED) {
+        if (input.charCodeAt(peg$currPos) === 39) {
+          s3 = peg$c30;
+          peg$currPos++;
+        } else {
+          s3 = peg$FAILED;
+          if (peg$silentFails === 0) { peg$fail(peg$c31); }
+        }
+        if (s3 !== peg$FAILED) {
+          peg$savedPos = s0;
+          s1 = peg$c32(s2);
+          s0 = s1;
+        } else {
+          peg$currPos = s0;
+          s0 = peg$FAILED;
+        }
+      } else {
+        peg$currPos = s0;
+        s0 = peg$FAILED;
+      }
+    } else {
+      peg$currPos = s0;
+      s0 = peg$FAILED;
+    }
+
+    return s0;
+  }
+
+  function peg$parseQuotedString() {
+    var s0, s1, s2, s3;
+
+    s0 = peg$currPos;
+    if (input.charCodeAt(peg$currPos) === 34) {
+      s1 = peg$c33;
+      peg$currPos++;
+    } else {
+      s1 = peg$FAILED;
+      if (peg$silentFails === 0) { peg$fail(peg$c34); }
+    }
+    if (s1 !== peg$FAILED) {
+      s2 = [];
+      s3 = peg$parseQuotedChars();
+      if (s3 === peg$FAILED) {
+        s3 = peg$parseVariable();
+      }
+      while (s3 !== peg$FAILED) {
+        s2.push(s3);
+        s3 = peg$parseQuotedChars();
+        if (s3 === peg$FAILED) {
+          s3 = peg$parseVariable();
+        }
+      }
+      if (s2 !== peg$FAILED) {
+        if (input.charCodeAt(peg$currPos) === 34) {
+          s3 = peg$c33;
+          peg$currPos++;
+        } else {
+          s3 = peg$FAILED;
+          if (peg$silentFails === 0) { peg$fail(peg$c34); }
+        }
+        if (s3 !== peg$FAILED) {
+          peg$savedPos = s0;
+          s1 = peg$c35(s2);
+          s0 = s1;
+        } else {
+          peg$currPos = s0;
+          s0 = peg$FAILED;
+        }
+      } else {
+        peg$currPos = s0;
+        s0 = peg$FAILED;
+      }
+    } else {
+      peg$currPos = s0;
+      s0 = peg$FAILED;
+    }
+
+    return s0;
+  }
+
+  function peg$parseWord() {
+    var s0, s1, s2;
+
+    s0 = peg$currPos;
+    s1 = [];
+    s2 = peg$parseBareStringChar();
+    if (s2 !== peg$FAILED) {
+      while (s2 !== peg$FAILED) {
+        s1.push(s2);
+        s2 = peg$parseBareStringChar();
+      }
+    } else {
+      s1 = peg$FAILED;
+    }
+    if (s1 !== peg$FAILED) {
+      peg$savedPos = s0;
+      s1 = peg$c36(s1);
+    }
+    s0 = s1;
+
+    return s0;
+  }
+
+  function peg$parseWordInBrace() {
+    var s0, s1, s2;
+
+    s0 = peg$currPos;
+    s1 = [];
+    s2 = peg$parseBraceStringChar();
+    if (s2 !== peg$FAILED) {
+      while (s2 !== peg$FAILED) {
+        s1.push(s2);
+        s2 = peg$parseBraceStringChar();
+      }
+    } else {
+      s1 = peg$FAILED;
+    }
+    if (s1 !== peg$FAILED) {
+      peg$savedPos = s0;
+      s1 = peg$c36(s1);
+    }
+    s0 = s1;
+
+    return s0;
+  }
+
+  function peg$parseVerbatimChars() {
+    var s0, s1, s2;
+
+    s0 = peg$currPos;
+    s1 = [];
+    s2 = peg$parseSingleStringChar();
+    if (s2 !== peg$FAILED) {
+      while (s2 !== peg$FAILED) {
+        s1.push(s2);
+        s2 = peg$parseSingleStringChar();
+      }
+    } else {
+      s1 = peg$FAILED;
+    }
+    if (s1 !== peg$FAILED) {
+      peg$savedPos = s0;
+      s1 = peg$c37(s1);
+    }
+    s0 = s1;
+
+    return s0;
+  }
+
+  function peg$parseQuotedChars() {
+    var s0, s1, s2;
+
+    s0 = peg$currPos;
+    s1 = [];
+    s2 = peg$parseDoubleStringChar();
+    if (s2 !== peg$FAILED) {
+      while (s2 !== peg$FAILED) {
+        s1.push(s2);
+        s2 = peg$parseDoubleStringChar();
+      }
+    } else {
+      s1 = peg$FAILED;
+    }
+    if (s1 !== peg$FAILED) {
+      peg$savedPos = s0;
+      s1 = peg$c37(s1);
+    }
+    s0 = s1;
+
+    return s0;
+  }
+
+  function peg$parseDoubleStringChar() {
+    var s0, s1, s2;
+
+    s0 = peg$currPos;
+    if (input.charCodeAt(peg$currPos) === 92) {
+      s1 = peg$c38;
+      peg$currPos++;
+    } else {
+      s1 = peg$FAILED;
+      if (peg$silentFails === 0) { peg$fail(peg$c39); }
+    }
+    if (s1 !== peg$FAILED) {
+      if (peg$c40.test(input.charAt(peg$currPos))) {
+        s2 = input.charAt(peg$currPos);
+        peg$currPos++;
+      } else {
+        s2 = peg$FAILED;
+        if (peg$silentFails === 0) { peg$fail(peg$c41); }
+      }
+      if (s2 !== peg$FAILED) {
+        peg$savedPos = s0;
+        s1 = peg$c42(s2);
+        s0 = s1;
+      } else {
+        peg$currPos = s0;
+        s0 = peg$FAILED;
+      }
+    } else {
+      peg$currPos = s0;
+      s0 = peg$FAILED;
+    }
+    if (s0 === peg$FAILED) {
+      s0 = peg$currPos;
+      if (input.substr(peg$currPos, 2) === peg$c43) {
+        s1 = peg$c43;
+        peg$currPos += 2;
+      } else {
+        s1 = peg$FAILED;
+        if (peg$silentFails === 0) { peg$fail(peg$c44); }
+      }
+      if (s1 !== peg$FAILED) {
+        peg$savedPos = s0;
+        s1 = peg$c45();
+      }
+      s0 = s1;
+      if (s0 === peg$FAILED) {
+        s0 = peg$currPos;
+        s1 = peg$currPos;
+        peg$silentFails++;
+        if (peg$c46.test(input.charAt(peg$currPos))) {
+          s2 = input.charAt(peg$currPos);
+          peg$currPos++;
+        } else {
+          s2 = peg$FAILED;
+          if (peg$silentFails === 0) { peg$fail(peg$c47); }
+        }
+        peg$silentFails--;
+        if (s2 === peg$FAILED) {
+          s1 = void 0;
+        } else {
+          peg$currPos = s1;
+          s1 = peg$FAILED;
+        }
+        if (s1 !== peg$FAILED) {
+          if (input.length > peg$currPos) {
+            s2 = input.charAt(peg$currPos);
+            peg$currPos++;
+          } else {
+            s2 = peg$FAILED;
+            if (peg$silentFails === 0) { peg$fail(peg$c48); }
+          }
+          if (s2 !== peg$FAILED) {
+            peg$savedPos = s0;
+            s1 = peg$c49(s2);
+            s0 = s1;
+          } else {
+            peg$currPos = s0;
+            s0 = peg$FAILED;
+          }
+        } else {
+          peg$currPos = s0;
+          s0 = peg$FAILED;
+        }
+      }
+    }
+
+    return s0;
+  }
+
+  function peg$parseSingleStringChar() {
+    var s0, s1, s2;
+
+    s0 = peg$currPos;
+    s1 = peg$currPos;
+    peg$silentFails++;
+    if (input.charCodeAt(peg$currPos) === 39) {
+      s2 = peg$c30;
+      peg$currPos++;
+    } else {
+      s2 = peg$FAILED;
+      if (peg$silentFails === 0) { peg$fail(peg$c31); }
+    }
+    peg$silentFails--;
+    if (s2 === peg$FAILED) {
+      s1 = void 0;
+    } else {
+      peg$currPos = s1;
+      s1 = peg$FAILED;
+    }
+    if (s1 !== peg$FAILED) {
+      if (input.length > peg$currPos) {
+        s2 = input.charAt(peg$currPos);
+        peg$currPos++;
+      } else {
+        s2 = peg$FAILED;
+        if (peg$silentFails === 0) { peg$fail(peg$c48); }
+      }
+      if (s2 !== peg$FAILED) {
+        peg$savedPos = s0;
+        s1 = peg$c49(s2);
+        s0 = s1;
+      } else {
+        peg$currPos = s0;
+        s0 = peg$FAILED;
+      }
+    } else {
+      peg$currPos = s0;
+      s0 = peg$FAILED;
+    }
+
+    return s0;
+  }
+
+  function peg$parseBraceStringChar() {
+    var s0, s1, s2;
+
+    s0 = peg$parseEscaped();
+    if (s0 === peg$FAILED) {
+      s0 = peg$currPos;
+      s1 = peg$currPos;
+      peg$silentFails++;
+      if (peg$c50.test(input.charAt(peg$currPos))) {
+        s2 = input.charAt(peg$currPos);
+        peg$currPos++;
+      } else {
+        s2 = peg$FAILED;
+        if (peg$silentFails === 0) { peg$fail(peg$c51); }
+      }
+      if (s2 === peg$FAILED) {
+        s2 = peg$parseWhitespace();
+      }
+      peg$silentFails--;
+      if (s2 === peg$FAILED) {
+        s1 = void 0;
+      } else {
+        peg$currPos = s1;
+        s1 = peg$FAILED;
+      }
+      if (s1 !== peg$FAILED) {
+        if (input.length > peg$currPos) {
+          s2 = input.charAt(peg$currPos);
+          peg$currPos++;
+        } else {
+          s2 = peg$FAILED;
+          if (peg$silentFails === 0) { peg$fail(peg$c48); }
+        }
+        if (s2 !== peg$FAILED) {
+          peg$savedPos = s0;
+          s1 = peg$c49(s2);
+          s0 = s1;
+        } else {
+          peg$currPos = s0;
+          s0 = peg$FAILED;
+        }
+      } else {
+        peg$currPos = s0;
+        s0 = peg$FAILED;
+      }
+    }
+
+    return s0;
+  }
+
+  function peg$parseBareStringChar() {
+    var s0, s1, s2;
+
+    s0 = peg$parseEscaped();
+    if (s0 === peg$FAILED) {
+      s0 = peg$currPos;
+      s1 = peg$currPos;
+      peg$silentFails++;
+      if (peg$c52.test(input.charAt(peg$currPos))) {
+        s2 = input.charAt(peg$currPos);
+        peg$currPos++;
+      } else {
+        s2 = peg$FAILED;
+        if (peg$silentFails === 0) { peg$fail(peg$c53); }
+      }
+      if (s2 === peg$FAILED) {
+        s2 = peg$parseWhitespace();
+      }
+      peg$silentFails--;
+      if (s2 === peg$FAILED) {
+        s1 = void 0;
+      } else {
+        peg$currPos = s1;
+        s1 = peg$FAILED;
+      }
+      if (s1 !== peg$FAILED) {
+        if (input.length > peg$currPos) {
+          s2 = input.charAt(peg$currPos);
+          peg$currPos++;
+        } else {
+          s2 = peg$FAILED;
+          if (peg$silentFails === 0) { peg$fail(peg$c48); }
+        }
+        if (s2 !== peg$FAILED) {
+          peg$savedPos = s0;
+          s1 = peg$c49(s2);
+          s0 = s1;
+        } else {
+          peg$currPos = s0;
+          s0 = peg$FAILED;
+        }
+      } else {
+        peg$currPos = s0;
+        s0 = peg$FAILED;
+      }
+    }
+
+    return s0;
+  }
+
+  function peg$parseEscaped() {
+    var s0, s1, s2;
+
+    s0 = peg$currPos;
+    if (input.substr(peg$currPos, 2) === peg$c43) {
+      s1 = peg$c43;
+      peg$currPos += 2;
+    } else {
+      s1 = peg$FAILED;
+      if (peg$silentFails === 0) { peg$fail(peg$c44); }
+    }
+    if (s1 !== peg$FAILED) {
+      peg$savedPos = s0;
+      s1 = peg$c45();
+    }
+    s0 = s1;
+    if (s0 === peg$FAILED) {
+      s0 = peg$currPos;
+      if (input.charCodeAt(peg$currPos) === 92) {
+        s1 = peg$c38;
+        peg$currPos++;
+      } else {
+        s1 = peg$FAILED;
+        if (peg$silentFails === 0) { peg$fail(peg$c39); }
+      }
+      if (s1 !== peg$FAILED) {
+        if (input.length > peg$currPos) {
+          s2 = input.charAt(peg$currPos);
+          peg$currPos++;
+        } else {
+          s2 = peg$FAILED;
+          if (peg$silentFails === 0) { peg$fail(peg$c48); }
+        }
+        if (s2 !== peg$FAILED) {
+          peg$savedPos = s0;
+          s1 = peg$c42(s2);
+          s0 = s1;
+        } else {
+          peg$currPos = s0;
+          s0 = peg$FAILED;
+        }
+      } else {
+        peg$currPos = s0;
+        s0 = peg$FAILED;
+      }
+    }
+
+    return s0;
+  }
+
+
+    const {
+      QuotedString,
+      VerbatimString,
+      Variable,
+      VariableAssignment,
+      Word,
+      Whitespace
+    } = tokens;
+
+    function singleOrList(list) {
+      return list.length === 1 ? list[0] : list;
+    }
+
+
+  peg$result = peg$startRuleFunction();
+
+  if (peg$result !== peg$FAILED && peg$currPos === input.length) {
+    return peg$result;
+  } else {
+    if (peg$result !== peg$FAILED && peg$currPos < input.length) {
+      peg$fail(peg$endExpectation());
+    }
+
+    throw peg$buildStructuredError(
+      peg$maxFailExpected,
+      peg$maxFailPos < input.length ? input.charAt(peg$maxFailPos) : null,
+      peg$maxFailPos < input.length
+        ? peg$computeLocation(peg$maxFailPos, peg$maxFailPos + 1)
+        : peg$computeLocation(peg$maxFailPos, peg$maxFailPos)
+    );
+  }
+}
+
+var parser = {
+  SyntaxError: peg$SyntaxError,
+  parse:       peg$parse
+};
+var parser_1 = parser.parse;
+
+/** Collapses adjacent whitespace down to a single space. Substituted variables which have no value
+ * are removed, and whitespace around them is considered adjacent.
+ * @param token The token to process. */
+function collapseWhitespace(token) {
+    if (Array.isArray(token)) {
+        let lastWasWs = false;
+        let hasOutput = false;
+        return transformChildren(token, child => {
+            if (child instanceof Whitespace) {
+                lastWasWs = true;
+                return;
+            }
+            const next = collapseWhitespace(child);
+            if (next == null)
+                return;
+            const prefixWs = lastWasWs && hasOutput;
+            lastWasWs = false;
+            hasOutput = true;
+            return prefixWs ? [new Whitespace(" "), next] : next;
+        });
+    }
+    return token;
+}
+
+/** Converts a token to a string. Whitespace is concatenated verbatim and quoted strings are
+ * expanded to their content, without the quotes. Variables which haven't been substituted are
+ * stripped. */
+function stringify(token) {
+    var _a;
+    return _a = str(token), (_a !== null && _a !== void 0 ? _a : "");
+}
+function str(token) {
+    var _a, _b, _c;
+    if (typeof token === "string")
+        return token;
+    if (Array.isArray(token)) {
+        return transformChildren(token, str).join("");
+    }
+    if (token instanceof VariableAssignment) {
+        return `${token.name}=${_a = str(token.value), (_a !== null && _a !== void 0 ? _a : "")}`;
+    }
+    if (token instanceof QuotedString) {
+        const contents = (_b = token.contents, (_b !== null && _b !== void 0 ? _b : ""));
+        if (typeof contents === "string")
+            return contents;
+        let result = "";
+        for (const item of contents) {
+            result += (_c = str(item), (_c !== null && _c !== void 0 ? _c : ""));
+        }
+        return result;
+    }
+    if (token instanceof Word ||
+        token instanceof VerbatimString ||
+        token instanceof Whitespace) {
+        return token.contents;
+    }
+}
+
+const parseOptions = { startRule: "VariableValue" };
+const parseEnvValue = (value) => parser_1(value, parseOptions);
+/** Returns a new syntax tree with all variable references substituted/expanded.
+ * @param token The root token to transform.
+ * @param env The environment to use for looking up/assigning variables.
+ * @param inlineAssignment Whether to set variable assignment tokens into the environment object as
+ * they are processed, allowing them to be referenced by later substitutions. Defaults to false. Set
+ * to true to enable `cross-env` style variable assignment. If true, the tokens are removed from the
+ * resulting tree once assigned. */
+function substitute(token, env, inlineAssignment = false) {
+    function sub(token) {
+        if (token instanceof Variable) {
+            const value = env[token.name];
+            if (value == null || value === "") {
+                return token.fallback ? sub(token.fallback) : null;
+            }
+            return parseEnvValue(value);
+        }
+        if (token instanceof VariableAssignment) {
+            const substitutedValue = sub(token.value);
+            if (inlineAssignment) {
+                const collapsedValue = collapseWhitespace(substitutedValue);
+                const stringValue = stringify(collapsedValue);
+                env[token.name] = stringValue;
+                return null;
+            }
+            return token.withValue(substitutedValue);
+        }
+        return transformChildren(token, sub);
+    }
+    return sub(token);
+}
+
+function toShellArgs(token) {
+    if (Array.isArray(token)) {
+        const args = [];
+        let lastWasWs = false;
+        for (const child of token) {
+            if (child instanceof Whitespace) {
+                lastWasWs = true;
+            }
+            else {
+                const next = toShellArgs(child);
+                if (next !== null) {
+                    if (lastWasWs || args.length === 0) {
+                        args.push(next);
+                    }
+                    else {
+                        args[args.length - 1] += next;
+                    }
+                    lastWasWs = false;
+                }
+            }
+        }
+        return args;
+    }
+    if (token instanceof Variable || token instanceof VariableAssignment) {
+        return null;
+    }
+    if (token instanceof QuotedString) {
+        return stringify(token);
+    }
+    if (token instanceof Word ||
+        token instanceof VerbatimString ||
+        token instanceof Whitespace) {
+        return token.contents;
+    }
+}
+
+/** Assigns any variable assignment tokens into the environment. If their value has not yet been
+ * substituted then the environment at that step is used. Note that the usual order for bash is to
+ * first substitute all tokens up front, then assign variables. If that ordering is preferred then
+ * call @see substitute() on the tree first. */
+function extractEnvironment(token, env = {}) {
+    function extract(t) {
+        if (t instanceof VariableAssignment) {
+            const substitutedValue = substitute(t.value, env, false);
+            const collapsedValue = collapseWhitespace(substitutedValue);
+            const stringValue = stringify(collapsedValue);
+            if (stringValue !== "") {
+                env[t.name] = stringValue;
+            }
+        }
+        else {
+            transformChildren(t, extract);
+        }
+        return t;
+    }
+    extract(token);
+    return env;
+}
+
+/** Parses the input expression for bash style variables, returning a parse tree. Supports bash
+ * style quotes (double and single), and default values.
+ * @param expression The input text to parse. Eg: "${NODE_ENV:-${ENV:-prod}}", "My name is $NAME",
+ * "And '  quoted' spaces".
+ * @returns The parse tree representing the input. */
+const parse = (expression) => parser_1(expression);
+/** Replaces environment variables in the input.
+ * @param expression The input text. Eg: "${NODE_ENV:-${ENV:-prod}}", "My name is $NAME",
+ * "And '  quoted' spaces".
+ * @param environment An object containing the environment variables and their values to replace in
+ * the expression.
+ * @returns A string with all environment variables either replaced, or removed if no value could be
+ * substituted. Adjacent whitespace is collapsed down to a single space unless quoted. */
+const replace = (expression, environment) => {
+    const parsed = parser_1(expression);
+    const substituted = substitute(parsed, environment);
+    const collapsed = collapseWhitespace(substituted);
+    return stringify(collapsed);
+};
+
+exports.QuotedString = QuotedString;
+exports.TransformChildren = TransformChildren;
+exports.Variable = Variable;
+exports.VariableAssignment = VariableAssignment;
+exports.VerbatimString = VerbatimString;
+exports.Whitespace = Whitespace;
+exports.Word = Word;
+exports.collapseWhitespace = collapseWhitespace;
+exports.extractEnvironment = extractEnvironment;
+exports.parse = parse;
+exports.replace = replace;
+exports.stringify = stringify;
+exports.substitute = substitute;
+exports.toShellArgs = toShellArgs;
+exports.transformChildren = transformChildren;
 //# sourceMappingURL=index.js.map
