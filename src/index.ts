@@ -28,28 +28,3 @@ export const replace = (expression: string, environment: Environment) => {
   const collapsed = collapseWhitespace(substituted);
   return stringify(collapsed);
 };
-
-// export function crossEnv(
-//   expression: string,
-//   environment: Environment,
-//   isWindows: boolean
-// ): string;
-
-// export function crossEnv(
-//   expression: string,
-//   environment: Environment,
-//   shell: "sh" | "bash" | "cmd"
-// ): string;
-
-// export function crossEnv(
-//   expression: string,
-//   environment: Environment,
-//   localiser: "sh" | "bash" | "cmd" | boolean
-// ) {
-//   const loc =
-//     typeof localiser === "boolean" ? (localiser ? "cmd" : "sh") : localiser;
-//   const parsed: ReadonlyArray<BuiltinToken> = parsePeg(expression);
-//   const substituted = substitute(parsed, environment);
-//   const collapsed = localiseVariables(substituted, loc);
-//   return stringify(collapsed);
-// }
