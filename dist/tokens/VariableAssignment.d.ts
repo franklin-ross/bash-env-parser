@@ -1,9 +1,13 @@
 import { TransformChildren } from "./infrastructure";
 /** A variable assignment like VAR=5, VAR="hello", or VAR=${OTHER}. */
-export declare class VariableAssignment {
+export declare class VariableAssignment<T = any> {
     readonly name: string;
-    readonly value: any;
-    constructor(name: string, value: any);
+    readonly value: T;
+    constructor(name: string, value: T);
     toString(): string;
-    [TransformChildren](transformer: (token: any) => any): VariableAssignment;
+    /** Clones this with a new value, unless the value is unchanged. */
+    withValue(newValue: T): VariableAssignment<T>;
+    /** Clones this with a new value, unless the value is unchanged. */
+    withValue<U>(newValue: U): VariableAssignment<U>;
+    [TransformChildren](transformer: (token: any) => any): VariableAssignment<any>;
 }

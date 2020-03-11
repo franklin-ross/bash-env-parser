@@ -1,4 +1,5 @@
 import { Environment } from "./Environment";
+import { BuiltinToken } from "./tokens";
 export * from "./tokens";
 export * from "./transforms";
 export { Environment } from "./Environment";
@@ -7,7 +8,7 @@ export { Environment } from "./Environment";
  * @param expression The input text to parse. Eg: "${NODE_ENV:-${ENV:-prod}}", "My name is $NAME",
  * "And '  quoted' spaces".
  * @returns The parse tree representing the input. */
-export declare const parse: (expression: string) => readonly (import("./tokens").Variable | import("./tokens").Word | import("./tokens").QuotedString | import("./tokens").VerbatimString | import("./tokens").Whitespace)[];
+export declare const parse: (expression: string) => readonly BuiltinToken[];
 /** Replaces environment variables in the input.
  * @param expression The input text. Eg: "${NODE_ENV:-${ENV:-prod}}", "My name is $NAME",
  * "And '  quoted' spaces".
