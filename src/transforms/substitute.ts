@@ -45,7 +45,7 @@ export function substitute(
   env: Environment,
   inlineAssignment: boolean = false
 ) {
-  return transformChildren(token, sub);
+  return sub(token);
 
   function sub(
     token: Token | ReadonlyArray<Token>

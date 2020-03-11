@@ -1488,7 +1488,7 @@ const parseEnvValue = (value) => parser_1(value, parseOptions);
  * to true to enable `cross-env` style variable assignment. If true, the tokens are removed from the
  * resulting tree once assigned. */
 function substitute(token, env, inlineAssignment = false) {
-    return transformChildren(token, sub);
+    return sub(token);
     function sub(token) {
         if (token instanceof Variable) {
             const value = env[token.name];
