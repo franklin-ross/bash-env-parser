@@ -1,18 +1,19 @@
 import { TransformChildren, transformChildren } from "./infrastructure";
+import { Token } from ".";
 
 /** A variable assignment like VAR=5, VAR="hello", or VAR=${OTHER}. */
-export class VariableAssignment<T = any> {
-  constructor(public readonly name: string, public readonly value: T) {}
+export class VariableAssignment {
+  constructor(
+    public readonly name: string,
+    public readonly value: Token | ReadonlyArray<Token>
+  ) {}
 
   toString() {
     return this.name + "=" + this.value;
   }
 
   /** Clones this with a new value, unless the value is unchanged. */
-  withValue(newValue: T): VariableAssignment<T>;
-  /** Clones this with a new value, unless the value is unchanged. */
-  withValue<U>(newValue: U): VariableAssignment<U>;
-  withValue(newValue: any) {
+  withValue(newValue: Token | readonly Token[]) {
     return this.value === newValue
       ? this
       : new VariableAssignment(this.name, newValue);

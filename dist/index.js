@@ -3,16 +3,15 @@
 Object.defineProperty(exports, '__esModule', { value: true });
 
 const TransformChildren = Symbol("transform children");
+//# sourceMappingURL=Symbols.js.map
 
 function transformChildren(value, transformer) {
-    if (value != null) {
-        if (Array.isArray(value)) {
-            return transformArray(value, transformer);
-        }
-        if (typeof value === "object" &&
-            typeof value[TransformChildren] === "function") {
-            return value[TransformChildren](transformer);
-        }
+    var _a;
+    if (Array.isArray(value)) {
+        return transformArray(value, transformer);
+    }
+    else if (typeof ((_a = value) === null || _a === void 0 ? void 0 : _a[TransformChildren]) === "function") {
+        return value[TransformChildren](transformer);
     }
     return value;
 }
@@ -38,17 +37,22 @@ function transformArray(value, transformer) {
     // When there are no changes, return this object.
     return value;
 }
-/** Push an item, or flatten an array of items into the list argument. */
+/** Push an item, or flatten an array of items into the list argument, removing nullish values. */
 function push(list, items) {
     if (items != null) {
         if (Array.isArray(items)) {
-            list.push(...items);
+            for (const item of items) {
+                if (item != null) {
+                    list.push(item);
+                }
+            }
         }
         else {
             list.push(items);
         }
     }
 }
+//# sourceMappingURL=transformChildren.js.map
 
 /** A variable reference like $VAR, ${VAR}, or ${VAR:-fallback}. */
 class Variable {
@@ -64,12 +68,15 @@ class Variable {
     }
     [TransformChildren](transformer) {
         const contents = this.fallback;
+        if (contents == null)
+            return contents;
         const transformed = transformChildren(contents, transformer);
         return transformed !== contents
             ? new Variable(this.name, this.fallbackType, transformed)
             : this;
     }
 }
+//# sourceMappingURL=Variable.js.map
 
 /** A variable assignment like VAR=5, VAR="hello", or VAR=${OTHER}. */
 class VariableAssignment {
@@ -80,6 +87,7 @@ class VariableAssignment {
     toString() {
         return this.name + "=" + this.value;
     }
+    /** Clones this with a new value, unless the value is unchanged. */
     withValue(newValue) {
         return this.value === newValue
             ? this
@@ -93,6 +101,7 @@ class VariableAssignment {
             : this;
     }
 }
+//# sourceMappingURL=VariableAssignment.js.map
 
 /** Text quoted with double quotes: ". Variables substitution is performed in these strings and
  * whitespace is preserved, but no other characters like ' have any special meaning. */
@@ -109,6 +118,7 @@ class QuotedString {
         return transformed !== contents ? new QuotedString(transformed) : this;
     }
 }
+//# sourceMappingURL=QuotedString.js.map
 
 /** Text quoted with single quotes: '. No variable substitution is performed in these strings,
  * whitespace is preserved, and no other characters have special meaning (like double quotes), so
@@ -121,6 +131,7 @@ class VerbatimString {
         return `'${this.contents}'`;
     }
 }
+//# sourceMappingURL=VerbatimString.js.map
 
 /** An unquoted word containing no whitespace. */
 class Word {
@@ -128,9 +139,10 @@ class Word {
         this.contents = contents;
     }
     toString() {
-        return `(${this.contents})`;
+        return `${this.contents}`;
     }
 }
+//# sourceMappingURL=Word.js.map
 
 /** Some whitespace between words, variables, or quoted strings. This is generally either stripped
  * or collapsed. */
@@ -139,11 +151,12 @@ class Whitespace {
         this.contents = contents;
     }
     toString() {
-        return `(${this.contents})`;
+        return `${this.contents}`;
     }
 }
+//# sourceMappingURL=Whitespace.js.map
 
-
+//# sourceMappingURL=index.js.map
 
 var tokens = /*#__PURE__*/Object.freeze({
   __proto__: null,
@@ -1404,29 +1417,29 @@ var parser = {
 };
 var parser_1 = parser.parse;
 
-/** Collapses adjacent whitespace down to a single space. Substituted variables which have no value
- * are removed, and whitespace around them is considered adjacent.
- * @param token The token to process. */
+/** Collapses adjacent whitespace down to a single space. Only collapses a single level, without
+ * recursing into children.
+ * @param token The token or array of tokens to process. */
 function collapseWhitespace(token) {
-    if (Array.isArray(token)) {
-        let lastWasWs = false;
-        let hasOutput = false;
-        return transformChildren(token, child => {
-            if (child instanceof Whitespace) {
-                lastWasWs = true;
-                return;
-            }
-            const next = collapseWhitespace(child);
-            if (next == null)
-                return;
-            const prefixWs = lastWasWs && hasOutput;
-            lastWasWs = false;
-            hasOutput = true;
-            return prefixWs ? [new Whitespace(" "), next] : next;
-        });
+    if (token == null)
+        return null;
+    if (!Array.isArray(token)) {
+        return token instanceof Whitespace ? null : token;
     }
-    return token;
+    let lastWasWs = false;
+    let hasOutput = false;
+    return transformChildren(token, child => {
+        if (child instanceof Whitespace) {
+            lastWasWs = true;
+            return null;
+        }
+        const prefixWs = lastWasWs && hasOutput;
+        lastWasWs = false;
+        hasOutput = true;
+        return prefixWs ? [new Whitespace(" "), child] : child;
+    });
 }
+//# sourceMappingURL=collapseWhitespace.js.map
 
 /** Converts a token to a string. Whitespace is concatenated verbatim and quoted strings are
  * expanded to their content, without the quotes. Variables which haven't been substituted are
@@ -1436,7 +1449,7 @@ function stringify(token) {
     return _a = str(token), (_a !== null && _a !== void 0 ? _a : "");
 }
 function str(token) {
-    var _a, _b, _c;
+    var _a, _b;
     if (typeof token === "string")
         return token;
     if (Array.isArray(token)) {
@@ -1450,9 +1463,11 @@ function str(token) {
         if (typeof contents === "string")
             return contents;
         let result = "";
-        for (const item of contents) {
-            result += (_c = str(item), (_c !== null && _c !== void 0 ? _c : ""));
-        }
+        transformChildren(contents, item => {
+            var _a;
+            result += (_a = str(item), (_a !== null && _a !== void 0 ? _a : ""));
+            return item;
+        });
         return result;
     }
     if (token instanceof Word ||
@@ -1461,6 +1476,7 @@ function str(token) {
         return token.contents;
     }
 }
+//# sourceMappingURL=stringify.js.map
 
 const parseOptions = { startRule: "VariableValue" };
 const parseEnvValue = (value) => parser_1(value, parseOptions);
@@ -1472,6 +1488,7 @@ const parseEnvValue = (value) => parser_1(value, parseOptions);
  * to true to enable `cross-env` style variable assignment. If true, the tokens are removed from the
  * resulting tree once assigned. */
 function substitute(token, env, inlineAssignment = false) {
+    return transformChildren(token, sub);
     function sub(token) {
         if (token instanceof Variable) {
             const value = env[token.name];
@@ -1482,8 +1499,12 @@ function substitute(token, env, inlineAssignment = false) {
         }
         if (token instanceof VariableAssignment) {
             const substitutedValue = sub(token.value);
+            if (substitutedValue == null)
+                return null;
             if (inlineAssignment) {
                 const collapsedValue = collapseWhitespace(substitutedValue);
+                if (collapsedValue == null)
+                    return null;
                 const stringValue = stringify(collapsedValue);
                 env[token.name] = stringValue;
                 return null;
@@ -1492,7 +1513,6 @@ function substitute(token, env, inlineAssignment = false) {
         }
         return transformChildren(token, sub);
     }
-    return sub(token);
 }
 
 function toShellArgs(token) {
@@ -1530,12 +1550,17 @@ function toShellArgs(token) {
         return token.contents;
     }
 }
+//# sourceMappingURL=toShellArgs.js.map
 
 /** Assigns any variable assignment tokens into the environment. If their value has not yet been
  * substituted then the environment at that step is used. Note that the usual order for bash is to
  * first substitute all tokens up front, then assign variables. If that ordering is preferred then
  * call @see substitute() on the tree first. */
 function extractEnvironment(token, env = {}) {
+    if (token != null) {
+        extract(token);
+    }
+    return env;
     function extract(t) {
         if (t instanceof VariableAssignment) {
             const substitutedValue = substitute(t.value, env, false);
@@ -1550,8 +1575,6 @@ function extractEnvironment(token, env = {}) {
         }
         return t;
     }
-    extract(token);
-    return env;
 }
 
 /** Parses the input expression for bash style variables, returning a parse tree. Supports bash
@@ -1573,6 +1596,7 @@ const replace = (expression, environment) => {
     const collapsed = collapseWhitespace(substituted);
     return stringify(collapsed);
 };
+//# sourceMappingURL=index.js.map
 
 exports.QuotedString = QuotedString;
 exports.TransformChildren = TransformChildren;

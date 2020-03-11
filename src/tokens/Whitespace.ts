@@ -4,6 +4,6 @@ export class Whitespace {
   constructor(public readonly contents: string) {}
 
   toString() {
-    return `(${this.contents})`;
+    return `${this.contents}`;
   }
 }

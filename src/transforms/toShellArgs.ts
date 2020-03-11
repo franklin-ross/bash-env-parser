@@ -4,24 +4,25 @@ import {
   Word,
   Whitespace,
   VerbatimString,
-  VariableAssignment
+  VariableAssignment,
+  Token
 } from "../tokens";
 import { stringify } from "./stringify";
 
 /** Convert the token list into an array of strings suitable for passing to a shell process as args.
  */
-export function toShellArgs(token: ReadonlyArray<any>): string[];
+export function toShellArgs(token: ReadonlyArray<Token>): string[];
 /** Unsubstituted variables are stripped from shell args. */
 export function toShellArgs(token: Variable | VariableAssignment): null;
 /** Convert the token list into an array of strings suitable for passing to a shell process as args.
  */
-export function toShellArgs(token: any): string;
+export function toShellArgs(token: Token): string;
 
-export function toShellArgs(token: any) {
+export function toShellArgs(token: Token | ReadonlyArray<Token>) {
   if (Array.isArray(token)) {
     const args: string[] = [];
     let lastWasWs = false;
-    for (const child of token) {
+    for (const child of token as Token[]) {
       if (child instanceof Whitespace) {
         lastWasWs = true;
       } else {
