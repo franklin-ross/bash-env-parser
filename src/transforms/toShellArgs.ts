@@ -1,18 +1,18 @@
 import {
   Variable,
-  SubstitutedVariable,
   QuotedString,
   Word,
   Whitespace,
   VerbatimString,
   VariableAssignment
 } from "../tokens";
+import { stringify } from "./stringify";
 
 /** Convert the token list into an array of strings suitable for passing to a shell process as args.
  */
 export function toShellArgs(token: ReadonlyArray<any>): string[];
 /** Unsubstituted variables are stripped from shell args. */
-export function toShellArgs(token: Variable): null;
+export function toShellArgs(token: Variable | VariableAssignment): null;
 /** Convert the token list into an array of strings suitable for passing to a shell process as args.
  */
 export function toShellArgs(token: any): string;
@@ -39,26 +39,12 @@ export function toShellArgs(token: any) {
     return args;
   }
 
-  if (token instanceof Variable) {
-    // Treat variables which haven't been substituted as though they have no value.
+  if (token instanceof Variable || token instanceof VariableAssignment) {
     return null;
   }
 
-  if (token instanceof SubstitutedVariable) {
-    const value = token.value;
-    return value == null ? null : join(toShellArgs(token.value));
-  }
-
-  if (token instanceof VariableAssignment) {
-    // Should variable assignments show up or be stripped?
-    return `${token.name}=${join(toShellArgs(token.value))}`;
-  }
-
   if (token instanceof QuotedString) {
-    return token.contents.reduce<string>((text, next) => {
-      if (typeof next === "string") return text + next;
-      return text + (join(toShellArgs(next)) ?? "");
-    }, "");
+    return stringify(token);
   }
 
   if (
@@ -68,10 +54,4 @@ export function toShellArgs(token: any) {
   ) {
     return token.contents;
   }
-}
-
-function join(x: null | string | readonly string[]): string {
-  if (x == null) return "";
-  if (typeof x === "string") return x;
-  return x.join("");
 }

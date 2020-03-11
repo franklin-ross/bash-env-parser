@@ -1,8 +1,5 @@
-import { Whitespace, SubstitutedVariable, transformChildren } from "../tokens";
+import { Whitespace, transformChildren } from "../tokens";
 
-export function collapseWhitespace(
-  token: SubstitutedVariable
-): SubstitutedVariable | null;
 export function collapseWhitespace(token: Whitespace): Whitespace | null;
 export function collapseWhitespace<T>(token: T): T;
 
@@ -26,17 +23,6 @@ export function collapseWhitespace(token: any): any {
       hasOutput = true;
       return prefixWs ? [new Whitespace(" "), next] : next;
     });
-  }
-
-  if (token instanceof SubstitutedVariable) {
-    const value = token.value;
-    if (typeof value === "string") {
-      const collapsed = value.trim().replace(/\s+/g, " ");
-      return collapsed === value
-        ? token
-        : new SubstitutedVariable(token.name, collapsed);
-    }
-    return collapseWhitespace(value);
   }
 
   return token;

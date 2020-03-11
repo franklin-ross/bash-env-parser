@@ -15,6 +15,8 @@
 
 start = (VariableAssignment / WordToken / Whitespace)*
 
+VariableValue = value:(NotWhitespace / Whitespace)* { return singleOrList(value) }
+
 WordToken = VerbatimString / QuotedString / Word / Variable
 
 VariableAssignment = name:VarName "=" value:WordToken+ {
@@ -38,6 +40,7 @@ VarName "variable name"
   = [a-zA-Z_][a-zA-Z_0-9]* { return text(); }
 
 Whitespace = [ \t\n\r]+ { return new Whitespace(text()); }
+NotWhitespace = [^ \t\n\r]+ { return new Word(text()); }
 
 VerbatimString = "'" chars:VerbatimChars "'" {
     return new VerbatimString(chars);

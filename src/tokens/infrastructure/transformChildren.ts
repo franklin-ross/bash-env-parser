@@ -4,19 +4,29 @@ interface IHaveChildren {
   [TransformChildren](transformer: (item: any) => any): this;
 }
 
-/** Transform an array, returning a new array if any children change. */
+/** Transform an array, returning a new array if any children change.
+ * @param value The array to transform.
+ * @param transformer The function to use to transform each child. Return a nullish value to remove
+ * the child, an array to replace it with multiple new items, or the original child.
+ */
 export function transformChildren<T>(
   value: ReadonlyArray<T>,
   transformer: (item: any) => any
 ): ReadonlyArray<T>;
 
-/** If the value provides support for transforming it's children, then transform them. */
+/** If the value provides support for transforming it's children, then transform them.
+ * @param value The array to transform.
+ * @param transformer The function to use to transform each child. Return a nullish value to remove
+ * the child, an array to replace it with multiple new items, or the original child.*/
 export function transformChildren<T extends IHaveChildren>(
   value: T,
   transformer: (item: any) => any
 ): T;
 
-/** Transform an object's children if it supports it. */
+/** Transform an object's children if it supports it.
+ * @param value The array to transform.
+ * @param transformer The function to use to transform each child. Return a nullish value to remove
+ * the child, an array to replace it with multiple new items, or the original child.*/
 export function transformChildren(
   value: any,
   transformer: (item: any) => any
@@ -40,6 +50,8 @@ export function transformChildren(
   return value;
 }
 
+/** Transforms an array, returning a new array only if any elements change. Nullish transform
+ * results are removed, and array transform results are flattened (by one level only.) */
 function transformArray(
   value: ReadonlyArray<any>,
   transformer: (item: any) => any
@@ -52,13 +64,11 @@ function transformArray(
 
     // Once a child has changed: create a new list, apply the changes, and return it.
     const newList = value.slice(0, i);
-    const pusher = push;
-    pusher(newList, transformed);
-    ++i;
-    for (; i < len; ++i) {
+    push(newList, transformed);
+    for (++i; i < len; ++i) {
       item = value[i];
       transformed = transformer(item);
-      pusher(newList, transformed);
+      push(newList, transformed);
     }
     return newList;
   }

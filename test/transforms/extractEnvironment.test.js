@@ -1,9 +1,9 @@
 const {
   extractEnvironment,
-  SubstitutedVariable: SubVar,
   Variable: Var,
   VariableAssignment: VarAssign,
-  Word: W
+  Word: W,
+  VerbatimString: VS
 } = require("../../");
 
 describe("transforms.extractEnvironment", () => {
@@ -14,7 +14,11 @@ describe("transforms.extractEnvironment", () => {
   const tests = [
     [[new VarAssign("VAR", new W("value"))], { VAR: "value" }],
     [[new VarAssign("VAR", new Var("WORD"))], { VAR: env.WORD }],
-    [[new VarAssign("VAR", new SubVar("WORD", "value"))], { VAR: "value" }]
+    [[new VarAssign("VAR", new VS(" "))], { VAR: " " }],
+    [[new VarAssign("VAR", null)], {}],
+    [[new VarAssign("VAR", new Var("EMPTY"))], {}],
+    [[new VarAssign("VAR", new W(""))], {}],
+    [[new VarAssign("VAR", new VS(""))], {}]
   ];
 
   tests.forEach(([ast, result]) =>

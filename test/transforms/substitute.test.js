@@ -1,6 +1,5 @@
 const {
   substitute,
-  SubstitutedVariable: SubVar,
   Variable: Var,
   VariableAssignment: VarAssign,
   Whitespace: Ws,
@@ -14,19 +13,15 @@ describe("transforms.substitute", () => {
 
   describe("without local assignment", () => {
     const tests = [
-      [new Var("WORD"), new SubVar("WORD", "word")],
+      [new Var("WORD"), new W("word")],
       [
         [new W("a"), new Var("WORD")],
-        [new W("a"), new SubVar("WORD", "word")]
+        [new W("a"), new W("word")]
       ],
-      [new Var("NONE"), new SubVar("NONE", null)],
+      [new Var("NONE"), null],
       [
-        [new VarAssign("VAR", new W("value")), new Ws(" "), new Var("VAR")],
-        [
-          new VarAssign("VAR", new W("value")),
-          new Ws(" "),
-          new SubVar("VAR", null)
-        ]
+        [new VarAssign("VAR", new Var("WORD")), new Ws(" "), new Var("VAR")],
+        [new VarAssign("VAR", new W("word")), new Ws(" ")]
       ]
     ];
 
@@ -42,19 +37,11 @@ describe("transforms.substitute", () => {
     const tests = [
       [
         [new VarAssign("VAR", new W("value")), new Ws(" "), new Var("VAR")],
-        [
-          new VarAssign("VAR", new W("value")),
-          new Ws(" "),
-          new SubVar("VAR", "value")
-        ]
+        [new Ws(" "), new W("value")]
       ],
       [
         [new VarAssign("VAR", new Var("WORD")), new Ws(" "), new Var("VAR")],
-        [
-          new VarAssign("VAR", new SubVar("WORD", "word")),
-          new Ws(" "),
-          new SubVar("VAR", "word")
-        ]
+        [new Ws(" "), new W("word")]
       ]
     ];
 

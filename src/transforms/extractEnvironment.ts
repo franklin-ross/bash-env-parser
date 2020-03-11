@@ -12,18 +12,19 @@ export function extractEnvironment(
   token: any,
   env: Environment = {}
 ): Environment {
-  const extract = (t: any) => {
+  function extract(t: any) {
     if (t instanceof VariableAssignment) {
-      const varAssign = t as VariableAssignment;
-      const substitutedValue = substitute(varAssign.value, env, false);
+      const substitutedValue = substitute(t.value, env, false);
       const collapsedValue = collapseWhitespace(substitutedValue);
       const stringValue = stringify(collapsedValue);
-      env[varAssign.name] = stringValue;
+      if (stringValue !== "") {
+        env[t.name] = stringValue;
+      }
     } else {
-      transformChildren(token, extract);
+      transformChildren(t, extract);
     }
     return t;
-  };
+  }
 
   extract(token);
   return env;

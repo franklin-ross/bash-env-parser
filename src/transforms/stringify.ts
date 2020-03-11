@@ -1,6 +1,4 @@
 import {
-  Variable,
-  SubstitutedVariable,
   QuotedString,
   Whitespace,
   VerbatimString,
@@ -9,44 +7,32 @@ import {
   VariableAssignment
 } from "../tokens";
 
-/** Variables which have not been substituted are stripped when converting to a string. */
-export function stringify(token: Variable): null;
-/** Variables which didn't match during substitution are stripped when converting to a string. */
-export function stringify(token: SubstitutedVariable): string | null;
 /** Converts a token to a string. Whitespace is concatenated verbatim and quoted strings are
  * expanded to their content, without the quotes. Variables which haven't been substituted are
  * stripped. */
-export function stringify(token: any): string;
+export function stringify(token: any): string {
+  return str(token) ?? "";
+}
 
-export function stringify(token: any): string | null {
+function str(token: any): string | null | undefined {
+  if (typeof token === "string") return token;
+
   if (Array.isArray(token)) {
-    return transformChildren(token, stringify).join("");
-  }
-
-  // Treat variables which haven't been substituted as though they have no value.
-  if (token instanceof Variable) return null;
-
-  if (token instanceof SubstitutedVariable) {
-    const value = token.value;
-    if (value == null) {
-      return null;
-    } else if (typeof value === "string") {
-      return value;
-    }
-    return stringify(value);
+    return transformChildren(token, str).join("");
   }
 
   if (token instanceof VariableAssignment) {
-    return `${token.name}=${stringify(token.value) ?? ""}`;
+    return `${token.name}=${str(token.value) ?? ""}`;
   }
 
   if (token instanceof QuotedString) {
-    return token.contents.reduce<string>((text, next) => {
-      if (typeof next === "string") {
-        return text + next;
-      }
-      return text + (stringify(next) ?? "");
-    }, "");
+    const contents = token.contents ?? "";
+    if (typeof contents === "string") return contents;
+    let result = "";
+    for (const item of contents) {
+      result += str(item) ?? "";
+    }
+    return result;
   }
 
   if (
@@ -56,6 +42,4 @@ export function stringify(token: any): string | null {
   ) {
     return token.contents;
   }
-
-  return null;
 }

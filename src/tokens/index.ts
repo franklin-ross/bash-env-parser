@@ -1,6 +1,5 @@
 import { Variable } from "./Variable";
 import { VariableAssignment } from "./VariableAssignment";
-import { SubstitutedVariable } from "./SubstitutedVariable";
 import { QuotedString } from "./QuotedString";
 import { VerbatimString } from "./VerbatimString";
 import { Word } from "./Word";
@@ -11,7 +10,6 @@ export * from "./infrastructure";
 export type BuiltinToken =
   | Variable
   | VariableAssignment
-  | SubstitutedVariable
   | Word
   | QuotedString
   | VerbatimString
@@ -20,7 +18,6 @@ export type BuiltinToken =
 export {
   Variable,
   VariableAssignment,
-  SubstitutedVariable,
   QuotedString,
   VerbatimString,
   Word,
