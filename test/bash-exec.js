@@ -28,8 +28,8 @@ const saveCache = () => {
 module.exports = {
   loadCache,
   saveCache,
-  get: (command, env) => {
-    const cached = cache[command];
+  get: (command, env, useCache = true) => {
+    const cached = useCache && cache[command];
     if (cached) return cached;
 
     // Use spawn so we can use bash on Windows without "/d /s /c" arguments on Node 10.
@@ -43,7 +43,9 @@ module.exports = {
       throw new Error(stderr);
     }
     const result = stdout.replace(/[\r\n]+$/, ""); // Can have trailing newlines we don't want
-    cache[command] = result;
+    if (useCache) {
+      cache[command] = result;
+    }
 
     return result;
   }
