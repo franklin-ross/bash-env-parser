@@ -1,51 +1,47 @@
 import { TransformChildren } from "./Symbols";
+import { Token } from "..";
 
-interface IHaveChildren {
-  [TransformChildren](transformer: (item: any) => any): this;
-}
+/** A function for transforming a token. */
+export type ITokenTransform = (
+  item: Token
+) => null | undefined | Token | ReadonlyArray<Token>;
 
 /** Transform an array, returning a new array if any children change.
  * @param value The array to transform.
  * @param transformer The function to use to transform each child. Return a nullish value to remove
  * the child, an array to replace it with multiple new items, or the original child.
  */
-export function transformChildren<T>(
-  value: ReadonlyArray<T>,
-  transformer: (item: any) => any
-): ReadonlyArray<T>;
-
-/** If the value provides support for transforming it's children, then transform them.
- * @param value The array to transform.
- * @param transformer The function to use to transform each child. Return a nullish value to remove
- * the child, an array to replace it with multiple new items, or the original child.*/
-export function transformChildren<T extends IHaveChildren>(
-  value: T,
-  transformer: (item: any) => any
-): T;
+export function transformChildren(
+  value: ReadonlyArray<Token>,
+  transformer: ITokenTransform
+): ReadonlyArray<Token>;
 
 /** Transform an object's children if it supports it.
- * @param value The array to transform.
+ * @param value The object which may have children to transform.
  * @param transformer The function to use to transform each child. Return a nullish value to remove
  * the child, an array to replace it with multiple new items, or the original child.*/
 export function transformChildren(
-  value: any,
-  transformer: (item: any) => any
-): any;
+  value: Token,
+  transformer: ITokenTransform
+): Token;
+
+/** Transform an array or an object's children if it supports it.
+ * @param value The object or array which may have children to transform.
+ * @param transformer The function to use to transform each child. Return a nullish value to remove
+ * the child, an array to replace it with multiple new items, or the original child.*/
+export function transformChildren(
+  value: Token | ReadonlyArray<Token>,
+  transformer: ITokenTransform
+): Token | ReadonlyArray<Token>;
 
 export function transformChildren(
-  value: any,
-  transformer: (item: any) => any
-): any {
-  if (value != null) {
-    if (Array.isArray(value)) {
-      return transformArray(value, transformer);
-    }
-    if (
-      typeof value === "object" &&
-      typeof value[TransformChildren] === "function"
-    ) {
-      return (value[TransformChildren] as any)(transformer);
-    }
+  value: Token | ReadonlyArray<Token>,
+  transformer: ITokenTransform
+): Token | ReadonlyArray<Token> {
+  if (Array.isArray(value)) {
+    return transformArray(value, transformer);
+  } else if (typeof (value as any)?.[TransformChildren] === "function") {
+    return (value as any)[TransformChildren](transformer);
   }
   return value;
 }
@@ -53,9 +49,9 @@ export function transformChildren(
 /** Transforms an array, returning a new array only if any elements change. Nullish transform
  * results are removed, and array transform results are flattened (by one level only.) */
 function transformArray(
-  value: ReadonlyArray<any>,
-  transformer: (item: any) => any
-): ReadonlyArray<any> {
+  value: ReadonlyArray<Token>,
+  transformer: ITokenTransform
+): ReadonlyArray<Token> {
   // Scan through the children until the transform function changes one of them.
   for (let i = 0, len = value.length; i < len; ++i) {
     let item = value[i];
@@ -77,13 +73,20 @@ function transformArray(
   return value;
 }
 
-/** Push an item, or flatten an array of items into the list argument. */
-function push(list: any[], items: any) {
+/** Push an item, or flatten an array of items into the list argument, removing nullish values. */
+function push(
+  list: Token[],
+  items: null | undefined | Token | ReadonlyArray<null | undefined | Token>
+) {
   if (items != null) {
     if (Array.isArray(items)) {
-      list.push(...items);
+      for (const item of items) {
+        if (item != null) {
+          list.push(item);
+        }
+      }
     } else {
-      list.push(items);
+      list.push(items as Token);
     }
   }
 }

@@ -1,11 +1,22 @@
-import { transformChildren } from "../tokens";
+import { transformChildren, Token } from "../tokens";
 
 /** Returns whether the token or any children match a test function. */
-export function some<T>(token: T, test: (token: any) => boolean): T | null {
+export function some(
+  token: Token | readonly Token[],
+  isMatch: (token: Token | readonly Token[]) => boolean
+): boolean {
   let found = false;
-  function doSome(t: any) {
-    if (found || (found = test(t))) return t;
+
+  if (Array.isArray(token)) {
+    transformChildren(token, doSome);
+  } else {
+    doSome(token as Token);
+  }
+
+  return found;
+
+  function doSome(t: Token) {
+    if (found || (found = isMatch(t))) return t;
     return transformChildren(t, doSome);
   }
-  return doSome(token);
 }

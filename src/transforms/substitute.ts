@@ -4,8 +4,7 @@ import {
   transformChildren,
   Whitespace,
   Word,
-  BuiltinToken,
-  VerbatimString
+  Token
 } from "../tokens";
 import { Environment } from "../Environment";
 import { collapseWhitespace } from "./collapseWhitespace";
@@ -17,10 +16,22 @@ const parseEnvValue = (value: string) =>
   parsePeg(value, parseOptions) as Array<Whitespace | Word>;
 
 export function substitute(
-  token: readonly BuiltinToken[],
+  token: Token,
   env: Environment,
   inlineAssignment?: boolean
-): BuiltinToken[];
+): Token;
+
+export function substitute(
+  token: readonly Token[],
+  env: Environment,
+  inlineAssignment?: boolean
+): readonly Token[];
+
+export function substitute(
+  token: Token | readonly Token[],
+  env: Environment,
+  inlineAssignment?: boolean
+): Token | readonly Token[];
 
 /** Returns a new syntax tree with all variable references substituted/expanded.
  * @param token The root token to transform.
@@ -30,11 +41,15 @@ export function substitute(
  * to true to enable `cross-env` style variable assignment. If true, the tokens are removed from the
  * resulting tree once assigned. */
 export function substitute(
-  token: any,
+  token: Token | readonly Token[],
   env: Environment,
   inlineAssignment: boolean = false
 ) {
-  function sub(token: any): any {
+  return sub(token);
+
+  function sub(
+    token: Token | ReadonlyArray<Token>
+  ): null | Token | ReadonlyArray<Token> {
     if (token instanceof Variable) {
       const value = env[token.name];
       if (value == null || value === "") {
@@ -45,8 +60,10 @@ export function substitute(
 
     if (token instanceof VariableAssignment) {
       const substitutedValue = sub(token.value);
+      if (substitutedValue == null) return null;
       if (inlineAssignment) {
         const collapsedValue = collapseWhitespace(substitutedValue);
+        if (collapsedValue == null) return null;
         const stringValue = stringify(collapsedValue);
         env[token.name] = stringValue;
         return null;
@@ -56,5 +73,4 @@ export function substitute(
 
     return transformChildren(token, sub);
   }
-  return sub(token);
 }
