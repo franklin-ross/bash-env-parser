@@ -14,20 +14,20 @@
   "author": "Franklin Ross",
   "license": "MIT",
   "devDependencies": {
-    "@types/jest": "^24.0.23",
+    "@types/jest": "^26.0.8",
     "@types/node": "^12.12.17",
-    "@types/pegjs": "^0.10.1",
+    "@types/pegjs": "^0.10.2",
     "cross-env": "6.0.3",
-    "jest": "^24.9.0",
+    "jest": "^26.2.2",
     "pegjs": "^0.10.0",
-    "prettier": "^1.19.1",
-    "rollup": "^1.27.13",
+    "prettier": "^2.0.5",
+    "rollup": "^2.23.0",
     "rollup-plugin-commonjs": "^10.1.0",
     "rollup-plugin-pegjs": "^2.1.3",
-    "rollup-plugin-terser": "^5.1.3",
-    "rollup-plugin-typescript2": "^0.25.3",
-    "terser": "^4.4.2",
-    "tslib": "^1.10.0",
-    "typescript": "^3.7.3"
+    "rollup-plugin-terser": "^6.1.0",
+    "rollup-plugin-typescript2": "^0.27.1",
+    "terser": "^5.0.0",
+    "tslib": "^2.0.0",
+    "typescript": "^3.9.7"
   }
 }
